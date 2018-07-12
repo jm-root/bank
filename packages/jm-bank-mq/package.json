@@ -1,0 +1,25 @@
+{
+  "name": "jm-bank-mq",
+  "version": "1.0.0",
+  "description": "mq plugin for jm-bank",
+  "main": "./lib/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jm-root/bank.git"
+  },
+  "keywords": [
+    "javascript",
+    "jm-bank-mq"
+  ],
+  "author": {
+    "name": "Jeff YU"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jm-root/bank/issues"
+  },
+  "homepage": "https://github.com/jm-root/bank",
+  "dependencies": {
+    "jm-log4js": "^1.1.1"
+  }
+}

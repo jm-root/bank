@@ -1,0 +1,29 @@
+{
+  "appenders": [
+    {
+      "type": "dateFile",
+      "filename": "logs/console",
+      "pattern": "-yyyyMMdd.log",
+      "alwaysIncludePattern": true,
+      "category": [
+        "console"
+      ]
+    },
+    {
+      "type": "dateFile",
+      "filename": "logs/bank",
+      "pattern": "-yyyyMMdd.log",
+      "alwaysIncludePattern": true,
+      "category": [
+        "bank"
+      ]
+    },
+    {
+      "type": "console"
+    }
+  ],
+  "replaceConsole": true,
+  "levels": {
+    "bank": "info"
+  }
+}

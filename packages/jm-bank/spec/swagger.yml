@@ -1,0 +1,88 @@
+openapi: 3.0.0
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/jm-root/bank/1.0.0
+info:
+  version: "1.0.0"
+  title: jm-bank-api
+  description: 银行API
+paths:
+  /bank/transfer:
+    post:
+      description: 转账
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferInfo'
+      responses:
+        '200':
+          description: 转账结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferResult'
+components:
+  schemas:
+    TransferInfo:
+      type: object
+      properties:
+        fromUserId:
+          type: string
+          description: 转出用户Id
+        toUserId:
+          type: string
+          description: 转入用户Id
+        ctCode:
+          type: string
+          description: 货币编码
+        amount:
+          type: integer
+          format: int64
+          description: 交易额度
+        allAmount:
+          type: integer
+          format: int32
+          description: 是否转出所有余额
+        memo:
+          type: string
+          description: 备注信息
+        orderId:
+          type: string
+          description: 关联订单Id
+    TransferResult:
+      type: object
+      properties:
+        amount:
+          type: integer
+          format: int64
+          description: 交易额度
+        memo:
+          type: string
+          description: 备注信息
+        orderId:
+          type: string
+          description: 关联订单Id
+        ctId:
+          type: integer
+          format: int32
+          description: 货币Id
+        crtime:
+          type: string
+          format: date-time
+          description: 交易时间
+        fromUserId:
+          type: string
+          description: 转出用户Id
+        fromUserBalance:
+          type: integer
+          format: int64
+          description: 转出用户余额
+        toUserId:
+          type: string
+          description: 转入用户Id
+        toUserBalance:
+          type: integer
+          format: int64
+          description: 转出用户余额

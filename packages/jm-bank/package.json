@@ -1,0 +1,40 @@
+{
+  "name": "jm-bank",
+  "version": "3.0.0",
+  "description": "",
+  "main": "./lib/index",
+  "scripts": {
+    "start": "jm-server",
+    "cluster": "jm-server --cluster",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jm-root/bank.git"
+  },
+  "keywords": [
+    "javascript",
+    "jm-bank",
+    "bank"
+  ],
+  "author": "Jeff YU",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jm-root/bank/issues"
+  },
+  "homepage": "https://github.com/jm-root/bank",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "continuation-local-storage": "^3.2.0",
+    "jm-bank-mqtt": "^0.0.2",
+    "jm-server": "^1.0.9",
+    "moment": "^2.18.1",
+    "mysql2": "^1.4.0",
+    "sequelize": "^4.4.2"
+  },
+  "devDependencies": {
+    "benchmark": "^2.1.4",
+    "jest": "^22.4.3",
+    "matcha": "^0.7.0"
+  }
+}
