@@ -11,5 +11,6 @@ module.exports = {
   'Invalid Locker': '无效锁',
   'UnLock amount big than locked amount': '超出锁定的数量',
   'Forbidden To Self Lock': '禁止自我锁定',
-  'Forbidden To Self UnLock': '禁止自我解锁'
+  'Forbidden To Self UnLock': '禁止自我解锁',
+  'Invalid allAmount, must be boolean or integer': 'allAmount参数无效, 必须是布尔型或者整数'
 }

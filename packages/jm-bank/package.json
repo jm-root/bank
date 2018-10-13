@@ -1,11 +1,9 @@
 {
   "name": "jm-bank",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "",
   "main": "./lib/index",
   "scripts": {
-    "start": "jm-server",
-    "cluster": "jm-server --cluster",
     "test": "jest"
   },
   "repository": {
@@ -25,16 +23,20 @@
   "homepage": "https://github.com/jm-root/bank",
   "dependencies": {
     "bluebird": "^3.5.0",
-    "continuation-local-storage": "^3.2.0",
-    "jm-bank-mqtt": "^0.0.2",
-    "jm-server": "^1.0.9",
+    "cls-hooked": "^4.2.2",
+    "jm-ms-sequlize": "1.0.7",
+    "jm-ms-wrapper": "^1.0.1",
     "moment": "^2.18.1",
     "mysql2": "^1.4.0",
     "sequelize": "^4.4.2"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
+    "config": "^2.0.1",
     "jest": "^22.4.3",
     "matcha": "^0.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }

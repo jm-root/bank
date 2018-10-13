@@ -50,4 +50,4 @@ npm run cluster
 
 db [] mysql服务器Uri
 
-tableNamePrefix [''] 表名称前缀
+table_name_prefix [''] 表名称前缀

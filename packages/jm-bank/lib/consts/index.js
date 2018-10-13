@@ -52,6 +52,10 @@ module.exports = {
     FA_SELF_UNLOCK: {
       err: BaseErrCode++,
       msg: 'Forbidden To Self UnLock'
+    },
+    FA_INVALID_ALLAMOUNT: {
+      err: BaseErrCode++,
+      msg: 'Invalid allAmount, must be boolean or integer'
     }
   }
 }
