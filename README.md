@@ -1,12 +1,12 @@
 # bank
 
-支付系统
+银行系统
 
 ## 配置参数
 
 基本配置 请参考 [jm-server] (https://github.com/jm-root/jm-server)
 
-db [] mongodb服务器Uri
+db [] 数据库服务器Uri
 
 table_name_prefix [''] 表名称前缀
 

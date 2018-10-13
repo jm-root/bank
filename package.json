@@ -7,6 +7,10 @@
     "start": "node app",
     "cluster": "node cluster"
   },
+  "dependencies": {
+    "config": "^2.0.1",
+    "jm-server": "^2.0.7"
+  },
   "devDependencies": {
     "lerna": "^2.11.0"
   }
