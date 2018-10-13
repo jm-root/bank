@@ -25,7 +25,6 @@ class Bank {
      * }
    */
   constructor (opts = {}) {
-    let self = this
     event.enableEvent(this)
     this.logger = log.getLogger('bank')
     this.t = t
@@ -40,19 +39,20 @@ class Bank {
       .filter(function (file) {
         return (file.indexOf('.') !== 0) && (file !== 'index.js')
       })
-      .forEach(function (file) {
+      .forEach(file => {
         let model = db.import(path.join(dir, file))
+        model.service = this
         DAO(model)
-        self[model.name] = model
+        this[model.name] = model
       })
 
-    Associations(self)
+    Associations(this)
 
     db
       .sync()
       .then(() => {
-        self.ready = true
-        self.emit('ready')
+        this.ready = true
+        this.emit('ready')
       })
   }
 
@@ -71,52 +71,6 @@ class Bank {
     if (allAmount === undefined) return
     if (_.isBoolean(allAmount) || _.isNumber(allAmount)) return
     throw error.err(Err.FA_INVALID_ALLAMOUNT)
-  }
-
-  /**
-   * 根据userId获取用户，如果不存在就自动创建
-   * @param {Object} opts
-   * @returns {Promise}
-   */
-  getUser (opts = {}) {
-    const {userId} = opts
-    if (!userId) {
-      throw error.err(Err.FA_INVALID_USER)
-    }
-    const data = {id: userId}
-    return this.user
-      .findOrCreate({
-        where: data,
-        defaults: data
-      })
-      .spread((user, created) => {
-        if (created) this.emit('user.create', user)
-        return user
-      })
-  }
-
-  /**
-   * 根据userId获取用户的默认账户
-   * @param {Object} opts
-   * @returns {Promise}
-   */
-  async getDefaultAccount (opts = {}) {
-    const doc = await this.getUser(opts)
-    return this.account.findOne({
-      where: {id: doc.accountId}
-    })
-  }
-
-  /**
-   * 根据userId获取用户的保险账户
-   * @param {Object} opts
-   * @returns {Promise}
-   */
-  async getSafeAccount (opts = {}) {
-    const doc = await this.getUser(opts)
-    return this.account.findOne({
-      where: {id: doc.safeAccountId}
-    })
   }
 
   /**
@@ -248,13 +202,9 @@ class Bank {
     if (opts.accountId) {
       p = self.account.findById(conditions.accountId)
     } else if (opts.safe) {
-      p = self.getSafeAccount({
-        userId: opts.userId
-      })
+      p = self.user.getSafeAccount(opts.userId)
     } else {
-      p = self.getDefaultAccount({
-        userId: opts.userId
-      })
+      p = self.user.getDefaultAccount(opts.userId)
     }
     return p
       .then(function (account) {
@@ -541,9 +491,7 @@ class Bank {
         opts.ctId = ct.id
 
         if (opts.fromUserId) {
-          return self.getUser({
-            userId: opts.fromUserId
-          })
+          return self.user.get(opts.fromUserId)
         }
         return null
       })
@@ -555,9 +503,7 @@ class Bank {
           opts.fromAccountId = user.accountId
         }
         if (opts.toUserId) {
-          return self.getUser({
-            userId: opts.toUserId
-          })
+          return self.user.get(opts.toUserId)
         }
         return null
       })
