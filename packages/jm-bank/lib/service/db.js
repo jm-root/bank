@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const cls = require('continuation-local-storage')
+const cls = require('cls-hooked')
 let namespace = cls.createNamespace('bank-namespace')
 Sequelize.useCLS(namespace)
 const Op = Sequelize.Op
@@ -40,7 +40,8 @@ const operatorsAliases = {
   $col: Op.col
 }
 
-module.exports = function (opts) {
+module.exports = function (opts = {}) {
+  if (!opts.db) throw new Error('invalid config: db')
   let o = {
     operatorsAliases,
     pool: {
@@ -49,10 +50,13 @@ module.exports = function (opts) {
       idle: 30000
     },
     dialectOptions: {
+      supportBigNumbers: true
+    },
+    define: {
       charset: 'utf8mb4',
-      collate: 'utf8mb4_unicode_ci',
-      supportBigNumbers: true,
-      bigNumberStrings: true
+      dialectOptions: {
+        collate: 'utf8mb4_unicode_ci'
+      }
     }
   }
   if (!opts.debug) {
