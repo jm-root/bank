@@ -1,6 +1,7 @@
 const event = require('jm-event')
 const error = require('jm-err')
 const MS = require('jm-ms-core')
+const wrapper = require('jm-ms-wrapper')
 const help = require('./help')
 const transfer = require('./transfer')
 const user = require('./user')
@@ -28,164 +29,112 @@ let ms = new MS()
 module.exports = function (opts = {}) {
   let service = this
   let router = ms.router()
+  wrapper(service.t)(router)
 
   service.routes || (service.routes = {})
   let routes = service.routes
   event.enableEvent(routes)
 
-  let t = function (doc, lng) {
-    if (doc && lng && doc.err && doc.msg) {
-      return {
-        err: doc.err,
-        msg: service.t(doc.msg, lng) || Err.t(doc.msg, lng) || doc.msg
-      }
+  routes.query = async function (opts = {}) {
+    return service.query(opts.data)
+  }
+
+  routes.transfer = async function (opts = {}) {
+    const {data} = opts
+    const {fromUserId, toUserId} = data
+    let p = null
+    if (fromUserId || toUserId) {
+      p = service.transByUser(data)
+    } else {
+      p = service.trans(data)
     }
+
+    const doc = await p
+
+    let o = {
+      id: doc.id,
+      amount: doc.amount,
+      memo: doc.memo,
+      ctId: doc.ctId,
+      crtime: doc.crtime
+    }
+    if (doc.fromAccountId) {
+      o.fromAccountId = doc.fromAccountId
+      o.fromAccountBalance = doc.fromAccountBalance
+    }
+    if (doc.toAccountId) {
+      o.toAccountId = doc.toAccountId
+      o.toAccountBalance = doc.toAccountBalance
+    }
+    fromUserId && (o.fromUserId = fromUserId)
+    toUserId && (o.toUserId = toUserId)
+    service.emit('transfer', o)
+
     return doc
   }
 
-  let onerr = (err) => {
-    return {
-      err: err.code || Err.FAIL.err,
-      msg: err.message
+  routes.lock = async function (opts = {}) {
+    const {data} = opts
+    let {ctId, ctCode, userId, fromUserId, accountId, amount} = data
+
+    if (!ctId) {
+      const ct = await service.validCT({code: ctCode})
+      ctId = ct.id
+      data.ctId = ctId
     }
+
+    if (!accountId) {
+      const account = await service.user.getDefaultAccount(userId)
+      accountId = account.id
+      data.accountId = accountId
+    }
+
+    let doc = await service.lock(data)
+
+    doc = {
+      fromUserId,
+      accountId,
+      ctId,
+      amount,
+      totalAmount: doc.locker.amount
+    }
+
+    return doc
   }
 
-  routes.query = function (opts = {}, cb, next) {
-    return service.db
-      .transaction(function (t) {
-        return service.query(opts.data)
-      })
-      .then(function (doc) {
-        cb(null, doc)
-      })
-      .catch(function (err) {
-        let doc = onerr(err)
-        doc = t(doc, opts.lng)
-        cb(err, doc)
-      })
-  }
+  routes.unlock = async function (opts = {}) {
+    const {data} = opts
+    let {ctId, ctCode, userId, fromUserId, accountId, amount} = data
 
-  routes.transfer = function (opts = {}, cb, next) {
-    let data = opts.data
-    return service.db
-      .transaction(function (t) {
-        if (data.fromUserId || data.toUserId) {
-          return service.transByUser(data)
-        } else {
-          return service.trans(data)
-        }
-      })
-      .then(function (doc) {
-        cb(null, doc)
-        let o = {
-          id: doc.id,
-          amount: doc.amount,
-          memo: doc.memo,
-          ctId: doc.ctId,
-          crtime: doc.crtime
-        }
-        if (doc.fromAccountId) {
-          o.fromAccountId = doc.fromAccountId
-          o.fromAccountBalance = doc.fromAccountBalance
-        }
-        if (doc.toAccountId) {
-          o.toAccountId = doc.toAccountId
-          o.toAccountBalance = doc.toAccountBalance
-        }
-        data.fromUserId && (o.fromUserId = data.fromUserId)
-        data.toUserId && (o.toUserId = data.toUserId)
-        service.emit('transfer', o)
-      })
-      .catch(function (err) {
-        let doc = onerr(err)
-        doc = t(doc, opts.lng)
-        cb(err, doc)
-      })
-  }
+    if (!ctId) {
+      const ct = await service.validCT({code: ctCode})
+      ctId = ct.id
+      data.ctId = ctId
+    }
 
-  routes.lock = function (opts = {}, cb, next) {
-    return service.db
-      .transaction(function (t) {
-        let data = opts.data
-        return service
-          .validCT({code: data.ctCode})
-          .then(function (ct) {
-            data.ctId = ct.id
-            if (!data.accountId) {
-              return service
-                .getDefaultAccount({userId: data.userId})
-                .then(function (account) {
-                  data.accountId = account.id
-                })
-            }
-            return data
-          })
-          .then(function () {
-            return service.lock(opts.data)
-          })
-      })
-      .then(function (doc) {
-        let data = opts.data
-        doc = {
-          fromUserId: data.fromUserId,
-          accountId: data.accountId,
-          ctId: data.ctId,
-          amount: data.amount,
-          totalAmount: Number(doc.locker.amount)
-        }
-        cb(null, doc)
-      })
-      .catch(function (err) {
-        let doc = onerr(err)
-        doc = t(doc, opts.lng)
-        cb(err, doc)
-      })
-  }
+    if (!accountId) {
+      const account = await service.user.getDefaultAccount(userId)
+      accountId = account.id
+      data.accountId = accountId
+    }
 
-  routes.unlock = function (opts = {}, cb, next) {
-    return service.db
-      .transaction(function (t) {
-        let data = opts.data
-        return service
-          .validCT({code: data.ctCode})
-          .then(function (ct) {
-            data.ctId = ct.id
-            if (!data.accountId) {
-              return service
-                .getDefaultAccount({userId: data.userId})
-                .then(function (account) {
-                  data.accountId = account.id
-                })
-            }
-            return data
-          })
-          .then(function () {
-            return service.unlock(opts.data)
-          })
-      })
-      .then(function (doc) {
-        let data = opts.data
-        doc = {
-          fromUserId: data.fromUserId,
-          accountId: data.accountId,
-          ctId: data.ctId,
-          amount: data.amount,
-          totalAmount: Number(doc.locker.amount)
-        }
-        cb(null, doc)
-      })
-      .catch(function (err) {
-        let doc = onerr(err)
-        doc = t(doc, opts.lng)
-        cb(err, doc)
-      })
+    let doc = await service.unlock(data)
+
+    doc = {
+      fromUserId,
+      accountId,
+      ctId,
+      amount,
+      totalAmount: doc.locker.amount
+    }
+
+    return doc
   }
 
   router
     .use(help(service))
-    .use(function (opts, cb, next) {
-      if (!service.ready) return cb(null, error.Err.FA_NOTREADY)
-      next()
+    .use(function (opts) {
+      if (!service.ready) throw error.err(error.Err.FA_NOTREADY)
     })
     .add('/query', 'get', routes.query)
     .add('/transfer', 'post', routes.transfer)
@@ -198,5 +147,20 @@ module.exports = function (opts = {}) {
     .use('/cts', ct(service))
     .use('/lockers', locker(service))
 
-  return router
+  let routerT = ms.router()
+  routerT
+    .use(async opts => {
+      return new Promise((resolve, reject) => {
+        service.db.transaction(async t => {
+          try {
+            const doc = await router.request(opts)
+            resolve(doc)
+          } catch (e) {
+            reject(e)
+          }
+        })
+      })
+    })
+
+  return routerT
 }
