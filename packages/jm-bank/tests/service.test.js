@@ -16,7 +16,7 @@ function log (doc) {
 
 describe('service', async () => {
   test('user', async () => {
-    let doc = await service.getUser({userId: userId})
+    let doc = await service.user.get(userId)
     log(doc)
     expect(doc).toBeTruthy()
   })

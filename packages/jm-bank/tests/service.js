@@ -1,9 +1,5 @@
-const config = require('../config')
+process.env.NODE_CONFIG_DIR = __dirname + '/../../../config'
+const config = require('../../../config')
 const $ = require('../lib')
-
-let service = $(config)
-service.log = (err, doc) => {
-  if (err) { console.error(err.stack) }
-  if (doc) console.log(doc)
-}
+const service = $(config)
 module.exports = service

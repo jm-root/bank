@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/jm-root/bank",
   "dependencies": {
-    "bluebird": "^3.5.0",
     "cls-hooked": "^4.2.2",
     "jm-ms-sequlize": "1.0.7",
     "jm-ms-wrapper": "^1.0.1",
@@ -32,6 +31,7 @@
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
+    "bson": "^3.0.2",
     "config": "^2.0.1",
     "jest": "^22.4.3",
     "matcha": "^0.7.0"
