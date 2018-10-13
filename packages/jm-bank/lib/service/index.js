@@ -1,14 +1,14 @@
+const _ = require('lodash')
+const log = require('jm-log4js')
 const event = require('jm-event')
 const error = require('jm-err')
-const t = require('../locale')
-const consts = require('../consts')
 const fs = require('fs')
 const path = require('path')
 const DB = require('./db')
 const DAO = require('./dao')
 const Associations = require('./associations')
-const Promise = require('bluebird')
-const log = require('jm-log4js')
+const t = require('../locale')
+const consts = require('../consts')
 
 let Err = consts.Err
 
@@ -22,7 +22,6 @@ class Bank {
    * @example
    * opts参数:{
      *  db: (可选，默认'mysql://127.0.0.1/bank')
-     *  tableNamePrefix: 表名前缀, (可选, 默认'')
      * }
    */
   constructor (opts = {}) {
@@ -61,10 +60,17 @@ class Bank {
     let self = this
     return new Promise(function (resolve, reject) {
       if (self.ready) return resolve(self.ready)
-      self.on('ready', function () {
+      self.once('ready', function () {
         resolve()
       })
     })
+  }
+
+  validParamAllAmount (opts = {}) {
+    const {allAmount} = opts.data || {}
+    if (allAmount === undefined) return
+    if (_.isBoolean(allAmount) || _.isNumber(allAmount)) return
+    throw error.err(Err.FA_INVALID_ALLAMOUNT)
   }
 
   /**
@@ -73,17 +79,18 @@ class Bank {
    * @returns {Promise}
    */
   getUser (opts = {}) {
-    let self = this
-    if (!opts.userId) {
+    const {userId} = opts
+    if (!userId) {
       throw error.err(Err.FA_INVALID_USER)
     }
-    return self.user
+    const data = {id: userId}
+    return this.user
       .findOrCreate({
-        where: {id: opts.userId},
-        defaults: {id: opts.userId}
+        where: data,
+        defaults: data
       })
-      .spread(function (user) {
-        self.emit('user.create', user)
+      .spread((user, created) => {
+        if (created) this.emit('user.create', user)
         return user
       })
   }
@@ -93,14 +100,11 @@ class Bank {
    * @param {Object} opts
    * @returns {Promise}
    */
-  getDefaultAccount (opts = {}) {
-    let self = this
-    return self.getUser(opts)
-      .then(function (user) {
-        return self.account.findOne({
-          where: {id: user.accountId}
-        })
-      })
+  async getDefaultAccount (opts = {}) {
+    const doc = await this.getUser(opts)
+    return this.account.findOne({
+      where: {id: doc.accountId}
+    })
   }
 
   /**
@@ -108,14 +112,11 @@ class Bank {
    * @param {Object} opts
    * @returns {Promise}
    */
-  getSafeAccount (opts = {}) {
-    let self = this
-    return self.getUser(opts)
-      .then(function (user) {
-        return self.account.findOne({
-          where: {id: user.safeAccountId}
-        })
-      })
+  async getSafeAccount (opts = {}) {
+    const doc = await this.getUser(opts)
+    return this.account.findOne({
+      where: {id: doc.safeAccountId}
+    })
   }
 
   /**
@@ -129,19 +130,18 @@ class Bank {
    * }
    * @returns {Promise}
    */
-  getCT (opts = {}) {
-    let self = this
-    if (!opts.code && !opts.id) {
+  async getCT (opts = {}) {
+    const {code, id, status} = opts
+    if (!code && !id) {
       throw error.err(Err.FA_INVALID_CT)
     }
-    let conditions = {}
-    opts.code && (conditions.code = opts.code)
-    opts.id && (conditions.id = opts.id)
-    opts.status && (conditions.status = opts.status)
-    return self.ct
-      .findOne({
-        where: conditions
-      })
+    const conditions = {}
+    code && (conditions.code = code)
+    id && (conditions.id = id)
+    status && (conditions.status = status)
+    return this.ct.findOne({
+      where: conditions
+    })
   }
 
   /**
@@ -154,14 +154,11 @@ class Bank {
    * }
    * @returns {Promise}
    */
-  validCT (opts = {}) {
+  async validCT (opts = {}) {
     opts.status = 1
-    return this
-      .getCT(opts)
-      .then(function (ct) {
-        if (!ct) throw error.err(Err.FA_INVALID_CT)
-        return ct
-      })
+    const doc = await this.getCT(opts)
+    if (!doc) throw error.err(Err.FA_INVALID_CT)
+    return doc
   }
 
   /**
@@ -170,23 +167,28 @@ class Bank {
    * @returns {Promise}
    */
   getBalance (opts = {}) {
-    let self = this
-    if (!opts.accountId) {
+    const {accountId, ctId} = opts
+
+    if (!accountId) {
       throw error.err(Err.FA_INVALID_ACCOUNT)
     }
-    if (!opts.ctId) {
+    if (!ctId) {
       throw error.err(Err.FA_INVALID_CT)
     }
-    let conditions = {
-      accountId: opts.accountId,
-      ctId: opts.ctId
+
+    const conditions = {
+      accountId,
+      ctId
     }
-    return self.balance.findOrCreate({
-      where: conditions,
-      defaults: conditions
-    }).spread(function (balance) {
-      return balance
-    })
+
+    return this.balance
+      .findOrCreate({
+        where: conditions,
+        defaults: conditions
+      })
+      .spread(function (balance) {
+        return balance
+      })
   }
 
   /**
@@ -195,20 +197,25 @@ class Bank {
    * @returns {Promise}
    */
   getLocker (opts = {}) {
-    let self = this
-    if (!opts.balanceId) {
+    const {balanceId, fromUserId} = opts
+
+    if (!balanceId) {
       throw error.err(Err.FA_INVALID_BALANCE)
     }
-    let conditions = {
-      balanceId: opts.balanceId
+
+    const conditions = {
+      balanceId
     }
-    opts.fromUserId && (conditions.fromUserId = opts.fromUserId)
-    return self.locker.findOrCreate({
-      where: conditions,
-      defaults: conditions
-    }).spread(function (locker) {
-      return locker
-    })
+    fromUserId && (conditions.fromUserId = fromUserId)
+
+    return this.locker
+      .findOrCreate({
+        where: conditions,
+        defaults: conditions
+      })
+      .spread(function (locker) {
+        return locker
+      })
   }
 
   /**
