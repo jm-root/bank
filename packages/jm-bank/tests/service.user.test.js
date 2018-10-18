@@ -12,7 +12,7 @@ beforeAll(async () => {
 describe('service.user', async () => {
   test('get', async () => {
     let doc = await service.get(id)
-    console.log(doc)
-    expect(doc).toBeTruthy()
+    console.log(doc.id)
+    expect(doc.id === id).toBeTruthy()
   })
 })

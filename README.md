@@ -8,8 +8,6 @@
 
 db [] 数据库服务器Uri
 
-table_name_prefix [''] 表名称前缀
-
 gateway Gateway服务器Uri
 
 disable_mq [] 禁用MQ插件

@@ -2,7 +2,7 @@ const log = require('jm-log4js')
 const logger = log.getLogger('bank')
 const MS = require('jm-ms')
 
-let ms = MS()
+let ms = new MS()
 
 module.exports = function (opts, app) {
   ['gateway'].forEach(function (key) {
@@ -11,21 +11,19 @@ module.exports = function (opts, app) {
 
   let o = {
     ready: true,
+    gateway: opts.gateway,
 
     onReady: function () {
       return this.ready
+    },
+
+    bind: async function (name, uri) {
+      uri || (uri = `/${name}`)
+      let doc = await ms.client({uri: this.gateway + uri})
+      this[name] = doc
+      return doc
     }
   }
-
-  let bind = (name, uri) => {
-    uri || (uri = '/' + name)
-    ms.client({
-      uri: opts.gateway + uri
-    }, function (err, doc) {
-      !err && doc && (o[name] = doc)
-    })
-  }
-  bind('mq')
 
   if (!app.modules.bank) {
     logger.warn('no bank module found. so I can not work.')
@@ -35,6 +33,8 @@ module.exports = function (opts, app) {
     logger.warn('no gateway config. so I can not work.')
     return o
   }
+
+  o.bind('mq')
 
   let bank = app.modules.bank
 

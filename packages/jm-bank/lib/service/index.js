@@ -10,7 +10,8 @@ const Associations = require('./associations')
 const t = require('../locale')
 const consts = require('../consts')
 
-let Err = consts.Err
+const Err = consts.Err
+const logger = log.getLogger('bank')
 
 /**
  * Class representing a bank.
@@ -26,7 +27,7 @@ class Bank {
    */
   constructor (opts = {}) {
     event.enableEvent(this)
-    this.logger = log.getLogger('bank')
+    this.logger = logger
     this.t = t
     this.ready = false
     this.db = DB(opts)
@@ -189,7 +190,6 @@ class Bank {
    */
   query (opts = {}) {
     let self = this
-    let logger = this.logger
     let d = Date.now()
     logger.debug('query begin: %j', opts)
     if (!opts.userId && !opts.accountId) {
@@ -263,7 +263,6 @@ class Bank {
    */
   updateAmount (opts = {}) {
     let self = this
-    let logger = this.logger
     let d = Date.now()
     logger.debug('updateAmount begin: %j', opts)
 
@@ -341,7 +340,6 @@ class Bank {
    * @return {Promise}
    */
   put (opts = {}) {
-    let logger = this.logger
     logger.debug('put: %j', opts)
     if (isNaN(opts.amount) || opts.amount <= 0) {
       throw error.err(Err.FA_INVALID_AMOUNT)
@@ -364,7 +362,6 @@ class Bank {
    * @return {Promise}
    */
   take (opts = {}) {
-    let logger = this.logger
     logger.debug('take: %j', opts)
     if (isNaN(opts.amount) || opts.amount <= 0) {
       throw error.err(Err.FA_INVALID_AMOUNT)
@@ -390,7 +387,6 @@ class Bank {
    */
   trans (opts = {}) {
     let self = this
-    let logger = this.logger
     logger.info('transfer begin: %j', opts)
     let d = Date.now()
     if (!opts.fromAccountId && !opts.toAccountId) {
@@ -471,7 +467,6 @@ class Bank {
    */
   transByUser (opts = {}) {
     let self = this
-    let logger = this.logger
     logger.info('transferByUser begin: %j', opts)
 
     if (!opts.fromUserId && !opts.toUserId) {
@@ -537,7 +532,6 @@ class Bank {
    */
   lock (opts = {}) {
     let self = this
-    let logger = this.logger
 
     if (opts.amount) {
       if (isNaN(opts.amount)) {
@@ -629,7 +623,6 @@ class Bank {
    */
   unlock (opts = {}) {
     let self = this
-    let logger = this.logger
 
     if (opts.amount) {
       if (isNaN(opts.amount)) throw error.err(Err.FA_INVALID_AMOUNT)
