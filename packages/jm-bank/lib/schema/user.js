@@ -25,17 +25,17 @@ module.exports = function (sequelize, DataTypes) {
     const data = {userId: user.id}
 
     let doc = await account.create(data, {transaction})
-    const accountId = doc.id
+    const defaultAccountId = doc.id
 
     doc = await account.create(data, {transaction})
     const safeAccountId = doc.id
 
-    user.accountId = accountId
+    user.defaultAccountId = defaultAccountId
     user.safeAccountId = safeAccountId
 
     await model.update(
       {
-        accountId,
+        defaultAccountId,
         safeAccountId
       },
       {
@@ -65,7 +65,7 @@ module.exports = function (sequelize, DataTypes) {
         defaults: data
       })
       .spread((doc, created) => {
-        if (created) service.emit('user.create', id)
+        if (created) service.emit('user.create', data)
         return doc
       })
   }
@@ -76,11 +76,8 @@ module.exports = function (sequelize, DataTypes) {
    * @returns {Promise<*>}
    */
   model.getDefaultAccount = async function (id) {
-    const {service} = this
     const doc = await this.get(id)
-    return service.account.findOne({
-      where: {id: doc.accountId}
-    })
+    return doc.getDefaultAccount()
   }
 
   /**
@@ -89,11 +86,8 @@ module.exports = function (sequelize, DataTypes) {
    * @returns {Promise<*>}
    */
   model.getSafeAccount = async function (id) {
-    const {service} = this
     const doc = await this.get(id)
-    return service.account.findOne({
-      where: {id: doc.safeAccountId}
-    })
+    return doc.getSafeAccount()
   }
 
   return model

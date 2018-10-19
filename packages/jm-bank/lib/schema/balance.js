@@ -8,7 +8,7 @@ module.exports = function (sequelize, DataTypes) {
         validate: {min: 0},
         comment: '允许透支额度,例如允许透支100, amount允许>=-100'
       },
-      amount: {type: DataTypes.BIGINT, defaultValue: 0, allowNull: false, validate: {min: 0}, comment: '实际余额'},
+      amount: {type: DataTypes.BIGINT, defaultValue: 0, allowNull: false, comment: '实际余额'},
       amountLocked: {type: DataTypes.BIGINT, defaultValue: 0, allowNull: false, validate: {min: 0}, comment: '冻结数量'},
       amountValid: {
         type: DataTypes.BIGINT,
