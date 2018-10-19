@@ -2,27 +2,21 @@ const error = require('jm-err')
 const consts = require('../consts')
 const Err = consts.Err
 
-/**
- * 用户
- * 注: 用户数据由外部引入,并同步更新
- * @param {Object} sequelize
- * @param {Object} DataTypes
- * @return {Model}
- */
 module.exports = function (sequelize, DataTypes) {
-  const model = sequelize.define('user', {
-    id: {type: DataTypes.STRING(32), primaryKey: true},
-    uid: {type: DataTypes.INTEGER, unique: true}, // 关联外键, uid
-    accountId: {type: DataTypes.INTEGER}, // 默认帐户id
-    safeAccountId: {type: DataTypes.INTEGER}, // 保险帐户id
-    name: {type: DataTypes.STRING}, // 用户名
-    status: {type: DataTypes.INTEGER, defaultValue: 1} // 状态(0:无效,1:有效)
-  }, {
-    tableName: 'user',
-    createdAt: 'crtime',
-    updatedAt: 'moditime',
-    deletedAt: 'delTime'
-  })
+  const model = sequelize.define('user',
+    {
+      id: {type: DataTypes.STRING(32), primaryKey: true},
+      name: {type: DataTypes.STRING(32), comment: '用户名'},
+      status: {type: DataTypes.INTEGER.UNSIGNED, defaultValue: 1, validate: {min: 0, max: 1}, comment: '状态(0:无效,1:有效)'}
+    },
+    {
+      tableName: 'user',
+      createdAt: 'crtime',
+      updatedAt: 'moditime',
+      deletedAt: 'deltime',
+      paranoid: true,
+      comment: '用户'
+    })
 
   // 创建用户时，自动创建一个默认账户和一个保险账户
   model.afterCreate(async (user, opts) => {

@@ -1,26 +1,20 @@
-/**
- * 转帐
- * 注:
- * @param {Object} sequelize
- * @param {Object} DataTypes
- * @return {Model}
- */
 module.exports = function (sequelize, DataTypes) {
-  return sequelize.define('transfer', {
-    ctId: {type: DataTypes.INTEGER}, // 币种,关联(ct)
-    fromAccountId: {type: DataTypes.INTEGER}, // 转出账户
-    toAccountId: {type: DataTypes.INTEGER}, // 转入账户
-    amount: {type: DataTypes.BIGINT}, // 交易额
-    fromAccountBalance: {type: DataTypes.BIGINT}, // 转出账户余额
-    toAccountBalance: {type: DataTypes.BIGINT}, // 转出账户余额
-    payId: {type: DataTypes.STRING(32)}, // 支付单号
-    attach: {type: DataTypes.STRING}, // 附加信息
-    orderId: {type: DataTypes.STRING(32)}, // 商户自编订单号
-    memo: {type: DataTypes.STRING} // 备注信息
-  }, {
-    tableName: 'transfer',
-    createdAt: 'crtime',
-    updatedAt: false,
-    deletedAt: 'delTime'
-  })
+  return sequelize.define('transfer',
+    {
+      amount: {type: DataTypes.BIGINT, allowNull: false, validate: {min: 0}, comment: '转账数量'},
+      fromAccountBalance: {type: DataTypes.BIGINT, comment: '转出账户的余额'},
+      toAccountBalance: {type: DataTypes.BIGINT, comment: '转入账户的余额'},
+      payId: {type: DataTypes.STRING(32), comment: '付款单号'},
+      attach: {type: DataTypes.STRING, comment: '附加信息'},
+      orderId: {type: DataTypes.STRING(32), comment: '商户自编订单号'},
+      memo: {type: DataTypes.STRING, comment: '备注信息'}
+    },
+    {
+      tableName: 'transfer',
+      createdAt: 'crtime',
+      updatedAt: false,
+      deletedAt: 'deltime',
+      paranoid: true,
+      comment: '转账'
+    })
 }
