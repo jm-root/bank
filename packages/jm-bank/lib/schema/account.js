@@ -1,5 +1,9 @@
+const error = require('jm-err')
+const consts = require('../consts')
+const Err = consts.Err
+
 module.exports = function (sequelize, DataTypes) {
-  return sequelize.define('account',
+  const model = sequelize.define('account',
     {
       password: {type: DataTypes.STRING(128), comment: '转帐密码'},
       salt: {type: DataTypes.STRING(128), comment: '转帐密钥'},
@@ -11,7 +15,9 @@ module.exports = function (sequelize, DataTypes) {
       createdAt: 'crtime',
       updatedAt: 'moditime',
       deletedAt: 'deltime',
-      comment: '账户表, 1个用户对应多个账户',
+      comment: '账户, 1个用户对应多个账户',
       paranoid: true
     })
+
+  return model
 }

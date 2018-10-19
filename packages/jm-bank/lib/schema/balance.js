@@ -1,5 +1,5 @@
 module.exports = function (sequelize, DataTypes) {
-  return sequelize.define('balance',
+  const model = sequelize.define('balance',
     {
       overdraw: {
         type: DataTypes.BIGINT,
@@ -29,7 +29,7 @@ module.exports = function (sequelize, DataTypes) {
       updatedAt: 'moditime',
       deletedAt: 'deltime',
       paranoid: true,
-      comment: '余额表, 对应1个账户和1个币种',
+      comment: '余额, 对应1个账户和1个币种',
       indexes: [
         {
           unique: true,
@@ -37,4 +37,39 @@ module.exports = function (sequelize, DataTypes) {
         }
       ]
     })
+
+  /**
+   *
+   * 根据 accountId 和 ctId 获取余额，没有就创建
+   *
+   * @param accountId
+   * @param ctId
+   * @returns {Promise<*>}
+   */
+  model.get = async function ({accountId, ctId}) {
+
+    if (!accountId) {
+      throw error.err(Err.FA_INVALID_ACCOUNT)
+    }
+
+    if (!ctId) {
+      throw error.err(Err.FA_INVALID_CT)
+    }
+
+    const data = {
+      accountId,
+      ctId
+    }
+
+    return this
+      .findOrCreate({
+        where: data,
+        defaults: data
+      })
+      .spread(doc => {
+        return doc
+      })
+  }
+
+  return model
 }

@@ -19,15 +19,14 @@ module.exports = function (sequelize, DataTypes) {
     })
 
   // 创建用户时，自动创建一个默认账户和一个保险账户
-  model.afterCreate(async (user, opts) => {
-    const {account} = model.service
-    const {transaction} = opts
+  model.afterCreate(async (user, {transaction}) => {
+    const {service} = model
     const data = {userId: user.id}
 
-    let doc = await account.create(data, {transaction})
+    let doc = await service.account.create(data, {transaction})
     const defaultAccountId = doc.id
 
-    doc = await account.create(data, {transaction})
+    doc = await service.account.create(data, {transaction})
     const safeAccountId = doc.id
 
     user.defaultAccountId = defaultAccountId
@@ -53,11 +52,10 @@ module.exports = function (sequelize, DataTypes) {
    * @returns {Promise<*>}
    */
   model.get = async function (id) {
+    const {service} = model
     if (!id) {
       throw error.err(Err.FA_INVALID_USER)
     }
-    const {service} = this
-    await service.onReady()
     const data = {id}
     return this
       .findOrCreate({
