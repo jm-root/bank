@@ -1,3 +1,8 @@
+const _ = require('lodash')
+const error = require('jm-err')
+const consts = require('../consts')
+const Err = consts.Err
+
 module.exports = function (sequelize, DataTypes) {
   const model = sequelize.define('balance',
     {
@@ -67,6 +72,79 @@ module.exports = function (sequelize, DataTypes) {
       .spread(doc => {
         return doc
       })
+  }
+
+  /**
+   * 更新余额
+   * @param {Object} opts 配置参数
+   * @example
+   * opts参数:{
+   *   id: balance id(必填)
+   *   amount: 数量(必填)
+   * }
+   * @example
+   * 成功返回: balance对象
+   * @return {Promise}
+   */
+  model.updateAmount = async function ({id, amount = 0}) {
+    const {service} = this
+
+    if (!id) {
+      throw error.err(Err.FA_INVALID_BALANCE)
+    }
+
+    if (!Number.isFinite(amount)) {
+      throw error.err(Err.FA_INVALID_AMOUNT)
+    }
+
+    const balance = await this.findById(id)
+    if (balance.amountValid + amount < 0) throw error.err(Err.FA_OUTOF_BALANCE)
+
+    await balance.increment({amount})
+
+    await balance.reload()
+
+    if (balance.amountValid < 0) throw error.err(Err.FA_OUTOF_BALANCE)
+
+    return balance
+  }
+
+  /**
+   * 存款
+   * @param {Object} opts 配置参数 -
+   * @example
+   * opts参数:{
+   *   id: balance id(必填)
+   *   amount: 数量(必填)
+   * }
+   * @example
+   * 成功返回: balance对象
+   * @return {Promise}
+   */
+  model.put = function ({id, amount = 0}) {
+    if (!Number.isFinite(amount) || amount < 0) {
+      throw error.err(Err.FA_INVALID_AMOUNT)
+    }
+    return this.updateAmount({id, amount})
+  }
+
+  /**
+   * 取款
+   * @param {Object} opts 配置参数 -
+   * @example
+   * opts参数:{
+   *   id: balance id(必填)
+   *   amount: 数量(必填)
+   * }
+   * @example
+   * 成功返回: balance对象
+   * @return {Promise}
+   */
+  model.take = function ({id, amount = 0}) {
+    if (!Number.isFinite(amount) || amount < 0) {
+      throw error.err(Err.FA_INVALID_AMOUNT)
+    }
+    return this.updateAmount({id, amount: -amount})
   }
 
   return model

@@ -71,6 +71,7 @@ module.exports = function (sequelize, DataTypes) {
         doc = codeMap[code]
       }
     }
+    if (!doc) throw error.err(Err.FA_INVALID_CT)
     return doc
   }
 

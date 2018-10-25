@@ -8,7 +8,7 @@ info:
   title: jm-bank-api
   description: 银行API
 paths:
-  /bank/users/{id}/balance:
+  /bank/users/{id}/query:
     get:
       description: 查询余额
       parameters:
@@ -48,6 +48,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransfersResult'
+  /bank/query:
+    get:
+      description: 查询余额
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: ctCode
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 查询结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResult'
   /bank/transfer:
     post:
       description: 转账

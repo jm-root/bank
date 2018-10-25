@@ -36,6 +36,10 @@ module.exports = {
     FA_SELF_TRANSFER: {
       err: BaseErrCode++,
       msg: 'Self Transfer Forbidden'
+    },
+    FA_DIFFERENT_CT:{
+      err: BaseErrCode++,
+      msg: 'Different Currency'
     }
   }
 }

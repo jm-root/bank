@@ -1,4 +1,5 @@
 const $ = require('./service')
+const {code, name} = require('./consts').ct
 
 let service = null
 beforeAll(async () => {
@@ -6,13 +7,12 @@ beforeAll(async () => {
   service = $.ct
 })
 
-const code = 'cny'
-const name = '人民币'
-
 describe('ct', async () => {
   test('find and create', async () => {
-    let doc = await service.get({code})
-    if (!doc) {
+    let doc = null
+    try {
+      doc = await service.get({code})
+    } catch (e) {
       doc = await service.create({
         code,
         name

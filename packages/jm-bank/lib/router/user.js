@@ -8,7 +8,7 @@ module.exports = function (service, opts) {
 
   router
     .add('/', 'get', opts => {
-      opts.fields || (opts.fields = ['id', 'uid', 'accountId', 'safeAccountId', 'name', 'status'])
+      opts.fields || (opts.fields = ['id', 'defaultAccountId', 'safeAccountId', 'name', 'status'])
       let data = opts.data
       opts.conditions || (opts.conditions = {})
       if (data.userId) {
@@ -16,10 +16,10 @@ module.exports = function (service, opts) {
       }
     })
     .add('/:id/query', 'get', opts => {
-
+      return model.query({...opts.data, userId: opts.params.id})
     })
     .add('/:id', 'get', opts => {
-      opts.fields || (opts.fields = ['id', 'uid', 'accountId', 'safeAccountId', 'name', 'status'])
+      opts.fields || (opts.fields = ['id', 'defaultAccountId', 'safeAccountId', 'name', 'status'])
     })
     .use(jmss(model))
 

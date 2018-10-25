@@ -7,5 +7,6 @@ module.exports = {
   'Invalid Amount': '无效数量',
   'Invalid Balance': '无效余额',
   'Out of Balance': '余额不足',
-  'Self Transfer Forbidden': '禁止转账给同一账户'
+  'Self Transfer Forbidden': '禁止转账给同一账户',
+  'Different Currency': '禁止不同币种互相转账'
 }

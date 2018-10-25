@@ -8,10 +8,10 @@ module.exports = function (service, opts) {
 
   router
     .add('/', 'get', opts => {
-      opts.fields || (opts.fields = ['id', 'code', 'name', 'status'])
+      opts.fields || (opts.fields = ['id', 'code', 'name'])
     })
     .add('/:id', 'get', opts => {
-      opts.fields || (opts.fields = ['id', 'code', 'name', 'status'])
+      opts.fields || (opts.fields = ['id', 'code', 'name'])
     })
     .use(jmss(model))
 
