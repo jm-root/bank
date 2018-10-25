@@ -67,36 +67,8 @@ class Bank {
     })
   }
 
-  validParamAllAmount (opts = {}) {
-    const {allAmount} = opts.data || {}
-    if (allAmount === undefined) return
-    if (_.isBoolean(allAmount) || _.isNumber(allAmount)) return
-    throw error.err(Err.FA_INVALID_ALLAMOUNT)
-  }
-
-  /**
-   * 获取货币
-   * @param {Object} opts
-   * @example
-   * opts参数:{
-   *   id: 货币id(可选, 二选一)
-   *   code: 货币code(可选, 二选一)
-   *   status: 状态(可选)
-   * }
-   * @returns {Promise}
-   */
   async getCT (opts = {}) {
-    const {code, id, status} = opts
-    if (!code && !id) {
-      throw error.err(Err.FA_INVALID_CT)
-    }
-    const conditions = {}
-    code && (conditions.code = code)
-    id && (conditions.id = id)
-    status && (conditions.status = status)
-    return this.ct.findOne({
-      where: conditions
-    })
+    throw new Error('pls use ct.get()')
   }
 
   /**
@@ -110,68 +82,14 @@ class Bank {
    * @returns {Promise}
    */
   async validCT (opts = {}) {
-    opts.status = 1
-    const doc = await this.getCT(opts)
-    if (!doc) throw error.err(Err.FA_INVALID_CT)
-    return doc
+    throw new Error('pls use ct.get()')
   }
 
-  /**
-   * 根据accountId和ctId获取余额，没有就创建
-   * @param {Object} opts
-   * @returns {Promise}
-   */
   getBalance (opts = {}) {
-    const {accountId, ctId} = opts
-
-    if (!accountId) {
-      throw error.err(Err.FA_INVALID_ACCOUNT)
-    }
-    if (!ctId) {
-      throw error.err(Err.FA_INVALID_CT)
-    }
-
-    const conditions = {
-      accountId,
-      ctId
-    }
-
-    return this.balance
-      .findOrCreate({
-        where: conditions,
-        defaults: conditions
-      })
-      .spread(function (balance) {
-        return balance
-      })
+    throw new Error('pls use account.getBalance()')
   }
 
-  /**
-   * 根据fromUserId和balanceId获取预授权锁，没有就创建
-   * @param {Object} opts
-   * @returns {Promise}
-   */
-  getLocker (opts = {}) {
-    const {balanceId, fromUserId} = opts
 
-    if (!balanceId) {
-      throw error.err(Err.FA_INVALID_BALANCE)
-    }
-
-    const conditions = {
-      balanceId
-    }
-    fromUserId && (conditions.fromUserId = fromUserId)
-
-    return this.locker
-      .findOrCreate({
-        where: conditions,
-        defaults: conditions
-      })
-      .spread(function (locker) {
-        return locker
-      })
-  }
 
   /**
    * 查询余额
@@ -513,190 +431,6 @@ class Bank {
       })
   }
 
-  /**
-   * 预授权，锁定指定数量的货币，amount累加
-   * @param {Object} opts 配置参数 -
-   * @example
-   * opts参数:{
-     *   fromUserId: 预授权用户Id(可选)
-     *   accountId: 被授权账户id
-     *   ctId: 币种id(ct二选一)
-     *   amount: 数量(必填)
-     *   allAmount: 是否全部数量(可选,默认:false)
-     * }
-   * @example
-   * 成功返回:{
-     *   locker: 预授权对象
-     *   balance: 余额对象
-     * }
-   */
-  lock (opts = {}) {
-    let self = this
-
-    if (opts.amount) {
-      if (isNaN(opts.amount)) {
-        throw error.err(Err.FA_INVALID_AMOUNT)
-      }
-      if (opts.amount < 0) {
-        throw error.err(Err.FA_INVALID_AMOUNT)
-      }
-    }
-
-    return self
-      .validCT({id: opts.ctId})
-      .then(function (ct) {
-        if (opts.fromUserId && opts.accountId) {
-          return self
-            .account.findOne({
-              where: {id: opts.accountId}
-            })
-            .then(function (account) {
-              if (opts.fromUserId === account.userId) throw error.err(Err.FA_SELF_UNLOCK)
-              return ct
-            })
-        }
-        return ct
-      })
-      .then(function (ct) {
-        return self.getBalance(opts)
-      })
-      .then(function (balance) {
-        if (!balance) throw error.err(Err.FA_OUTOF_BALANCE)
-        let amountValid = Number(balance.amountValid)
-        if (opts.allAmount) {
-          opts.amount = amountValid
-          if (opts.amount < 0) opts.amount = 0
-        }
-        if (amountValid < opts.amount) throw error.err(Err.FA_OUTOF_BALANCE)
-        return balance.increment({amountLocked: opts.amount})
-      })
-      .then(function (balance) {
-        return balance.reload()
-      })
-      .then(function (balance) {
-        let conditions = {
-          balanceId: balance.id
-        }
-        opts.fromUserId && (conditions.fromUserId = conditions)
-        return self
-          .getLocker(conditions)
-          .then(function (locker) {
-            return locker.increment({amount: opts.amount})
-              .then(function (locker) {
-                return locker.reload()
-              })
-              .then(function (locker) {
-                return {balance: balance, locker: locker}
-              })
-          })
-      })
-      .then(function (info) {
-        logger.info('lock %j', info)
-        let obj = {
-          fromUserId: opts.fromUserId,
-          accountId: opts.accountId,
-          ctId: opts.ctId,
-          amount: opts.amount,
-          totalAmount: Number(info.locker.amount)
-        }
-        self.emit('bank.lock', obj)
-        return info
-      })
-  }
-
-  /**
-   * 预授权解除，解锁指定数量的货币
-   * @param {Object} opts 配置参数 -
-   * @example
-   * opts参数:{
-     *   fromUserId: 预授权用户Id(可选)
-     *   accountId: 被授权账户id
-     *   ctId: 币种id(ct二选一)
-     *   amount: 数量(必填)
-     *   allAmount: 是否全部数量(可选,默认:false)
-     * }
-   * @example
-   * 成功返回:{
-     *   locker: 预授权对象
-     *   balance: 币种持有量对象
-     * }
-   */
-  unlock (opts = {}) {
-    let self = this
-
-    if (opts.amount) {
-      if (isNaN(opts.amount)) throw error.err(Err.FA_INVALID_AMOUNT)
-      if (opts.amount < 0) throw error.err(Err.FA_INVALID_AMOUNT)
-      opts.amount = Math.abs(opts.amount)
-    }
-
-    let _balance
-    let _locker
-    return self
-      .validCT({id: opts.ctId})
-      .then(function (ct) {
-        if (opts.fromUserId && opts.accountId) {
-          return self
-            .account.findOne({
-              where: {id: opts.accountId}
-            })
-            .then(function (account) {
-              if (opts.fromUserId === account.userId) throw error.err(Err.FA_SELF_UNLOCK)
-              return ct
-            })
-        }
-        return ct
-      })
-      .then(function (ct) {
-        return self.getBalance(opts)
-      })
-      .then(function (balance) {
-        _balance = balance
-        return self.getLocker(
-          {balanceId: balance.id, fromUserId: opts.fromUserId}
-        )
-      })
-      .then(function (locker) {
-        _locker = locker
-        let amount = Number(locker.amount)
-        if (opts.allAmount) {
-          opts.amount = amount
-        } else {
-          if (amount < opts.amount) opts.amount = amount
-        }
-        if (opts.amount === amount) { // 直接移除授权
-          _locker = null
-          return locker.destroy()
-        } else {
-          return locker
-            .decrement({amount: opts.amount})
-            .then(function (locker) {
-              return locker.reload()
-            })
-        }
-      })
-      .then(function () {
-        return _balance.decrement({amountLocked: opts.amount})
-      })
-      .then(function (balance) {
-        return balance.reload()
-      })
-      .then(function (balance) {
-        return {balance: balance, locker: _locker || {}}
-      })
-      .then(function (info) {
-        logger.info('unlock %j', info)
-        let obj = {
-          fromUserId: opts.fromUserId,
-          accountId: opts.accountId,
-          ctId: opts.ctId,
-          amount: opts.amount,
-          totalAmount: Number(info.locker.amount || 0)
-        }
-        self.emit('bank.unlock', obj)
-        return info
-      })
-  }
 }
 
 module.exports = Bank

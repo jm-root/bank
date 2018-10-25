@@ -15,6 +15,9 @@ module.exports = function (service, opts) {
         opts.conditions.id = data.userId
       }
     })
+    .add('/:id/query', 'get', opts => {
+
+    })
     .add('/:id', 'get', opts => {
       opts.fields || (opts.fields = ['id', 'uid', 'accountId', 'safeAccountId', 'name', 'status'])
     })

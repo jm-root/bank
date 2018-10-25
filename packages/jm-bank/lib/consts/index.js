@@ -35,27 +35,7 @@ module.exports = {
     },
     FA_SELF_TRANSFER: {
       err: BaseErrCode++,
-      msg: 'Forbidden To Self Transfer'
-    },
-    FA_INVALID_LOCKER: {
-      err: BaseErrCode++,
-      msg: 'Invalid Locker'
-    },
-    FA_UNLOCK_OUTOF_RANGE: {
-      err: BaseErrCode++,
-      msg: 'UnLock amount big than locked amount'
-    },
-    FA_SELF_LOCK: {
-      err: BaseErrCode++,
-      msg: 'Forbidden To Self Lock'
-    },
-    FA_SELF_UNLOCK: {
-      err: BaseErrCode++,
-      msg: 'Forbidden To Self UnLock'
-    },
-    FA_INVALID_ALLAMOUNT: {
-      err: BaseErrCode++,
-      msg: 'Invalid allAmount, must be boolean or integer'
+      msg: 'Self Transfer Forbidden'
     }
   }
 }

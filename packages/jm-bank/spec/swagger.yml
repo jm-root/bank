@@ -2,12 +2,52 @@ openapi: 3.0.0
 # Added by API Auto Mocking Plugin
 servers:
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/jm-root/bank/1.0.0
+    url: https://virtserver.swaggerhub.com/jm-root/bank/4.0.0
 info:
-  version: "1.0.0"
+  version: "4.0.0"
   title: jm-bank-api
   description: 银行API
 paths:
+  /bank/users/{id}/balance:
+    get:
+      description: 查询余额
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ctCode
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 查询结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResult'
+  /bank/users/{id}/transfers:
+    get:
+      description: 查询转账记录
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ctCode
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 查询结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransfersResult'
   /bank/transfer:
     post:
       description: 转账
@@ -68,6 +108,9 @@ components:
           type: integer
           format: int32
           description: 货币Id
+        ctCode:
+          type: string
+          description: 货币编码
         crtime:
           type: string
           format: date-time
@@ -75,14 +118,18 @@ components:
         fromUserId:
           type: string
           description: 转出用户Id
-        fromUserBalance:
+        fromBalanceAmount:
           type: integer
           format: int64
           description: 转出用户余额
         toUserId:
           type: string
           description: 转入用户Id
-        toUserBalance:
+        toBalanceAmount:
           type: integer
           format: int64
           description: 转出用户余额
+    BalanceResult:
+      type: object
+    TransfersResult:
+      type: object

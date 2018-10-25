@@ -15,26 +15,6 @@ function log (doc) {
 }
 
 describe('service', async () => {
-  test('user', async () => {
-    let doc = await service.user.get(userId)
-    log(doc)
-    expect(doc).toBeTruthy()
-  })
-
-  test('ct', async () => {
-    let doc = await service.ct
-      .find({
-        where: {code: ctCode}
-      })
-    if (!doc) {
-      doc = await service.ct.create({
-        code: ctCode,
-        name: ctName
-      })
-    }
-    expect(doc).toBeTruthy()
-  })
-
   test('query', async () => {
     let doc = await service.query({
       userId: userId,
