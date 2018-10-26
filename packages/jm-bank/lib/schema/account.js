@@ -78,7 +78,16 @@ module.exports = function (sequelize, DataTypes) {
       data.toAccountBalance = doc.amount
     }
 
-    return service.transfer.create(data)
+    const doc = await service.transfer.create(data)
+
+    const o = {
+      ...data,
+      ...doc.get({plain: true})
+    }
+
+    service.emit('transfer', o)
+
+    return doc
   }
 
   return model

@@ -175,16 +175,7 @@ module.exports = function (sequelize, DataTypes) {
       data.toAccountId = doc.defaultAccountId
     }
 
-    const doc = await service.account.transfer(data)
-
-    const o = {
-      ...data,
-      ...doc.get({plain: true})
-    }
-
-    service.emit('transfer', o)
-
-    return doc
+    return await service.account.transfer(data)
   }
 
   return model
