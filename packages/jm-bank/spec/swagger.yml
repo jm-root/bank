@@ -8,46 +8,6 @@ info:
   title: jm-bank-api
   description: 银行API
 paths:
-  /bank/users/{id}/query:
-    get:
-      description: 查询余额
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: ctCode
-          in: query
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 查询结果
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BalanceResult'
-  /bank/users/{id}/transfers:
-    get:
-      description: 查询转账记录
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: ctCode
-          in: query
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 查询结果
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TransfersResult'
   /bank/query:
     get:
       description: 查询余额
@@ -150,6 +110,4 @@ components:
           format: int64
           description: 转出用户余额
     BalanceResult:
-      type: object
-    TransfersResult:
       type: object

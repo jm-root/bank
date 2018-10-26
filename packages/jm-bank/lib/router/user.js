@@ -19,9 +19,6 @@ module.exports = function (service, opts) {
         opts.conditions.id = data.userId
       }
     })
-    .add('/:id/query', 'get', opts => {
-      return model.query({...opts.data, userId: opts.params.id})
-    })
     .add('/:id', 'get', opts => {
       opts.fields || (opts.fields = ['id', 'defaultAccountId', 'safeAccountId', 'name', 'status'])
     })
