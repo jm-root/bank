@@ -13,7 +13,7 @@ beforeAll(async () => {
 describe('router', async () => {
   test('list', async () => {
     let doc = await router
-      .get('/transfers')
+      .get('/transfers', {rows: 10})
     expect(doc).toBeTruthy()
   })
 

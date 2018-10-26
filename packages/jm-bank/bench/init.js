@@ -18,13 +18,25 @@ async function initUser () {
   return $.user.get(id)
 }
 
+async function transfer () {
+  return $.user.transfer({
+    ctCode: 'cny',
+    toUserId: '000000000000000000000000',
+    amount: 100
+  })
+}
+
 async function init () {
   for (let i = 0; i < 100; i++) {
-    await initCT()
+    // await initCT()
   }
 
   for (let i = 0; i < 100 * 10000; i++) {
-    await initUser()
+    // await initUser()
+  }
+
+  for (let i = 0; i < 100 * 10000; i++) {
+    await transfer()
   }
 
 }
