@@ -13,9 +13,7 @@ const amount = 300
 
 describe('service.user', async () => {
   test('list', async () => {
-    let doc = await service.find2()
-    expect(doc).toBeTruthy()
-    doc = await service.find2({rows: 5})
+    let doc = await service.find2({rows: 5})
     expect(doc).toBeTruthy()
   })
 
@@ -46,7 +44,7 @@ describe('service.user', async () => {
   })
 
   test('from', async () => {
-    const doc = await service.transfer({fromUserId: id, ctCode: ct.code, amount, memo: '测试货币回收'})
+    const doc = await service.transfer({fromUserId: id, ctCode: ct.code, allAmount: 1, memo: '测试货币回收'})
     expect(doc.amount === amount).toBeTruthy()
   })
 

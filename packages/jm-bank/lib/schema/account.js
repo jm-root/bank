@@ -85,6 +85,7 @@ module.exports = function (sequelize, DataTypes) {
       if (amount <= 0) {
         throw error.err(Err.FA_OUTOF_BALANCE)
       }
+      data.amount = amount
     }
 
     if (toAccountId) {
