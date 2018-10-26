@@ -58,7 +58,7 @@ module.exports = function (opts = {}) {
 
   let routerT = ms.router()
   routerT
-    .use(async opts => {
+    .use(opts => {
       return new Promise((resolve, reject) => {
         service.db.transaction(async t => {
           try {
@@ -66,6 +66,7 @@ module.exports = function (opts = {}) {
             resolve(doc)
           } catch (e) {
             reject(e)
+            throw e
           }
         })
       })
