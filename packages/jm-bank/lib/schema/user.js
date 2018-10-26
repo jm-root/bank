@@ -105,7 +105,7 @@ module.exports = function (sequelize, DataTypes) {
    * @return {Promise}
    */
   model.query = async function (opts = {}) {
-    logger.info(`user.query`, opts)
+    logger.debug(`user.query`, opts)
     const {service} = this
     const {userId, ctCode, ctId, safe} = opts
 
