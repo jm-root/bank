@@ -54,7 +54,7 @@ module.exports = function (service, opts) {
 
       opts.fields || (opts.fields = fields)
 
-      opts.order || (opts.order = [['crtime', 'DESC']])
+      opts.order || (opts.order = [['id', 'DESC']])
 
       opts.conditions || (opts.conditions = {})
 
@@ -74,23 +74,6 @@ module.exports = function (service, opts) {
       fromAccountId !== undefined && (opts.conditions.fromAccountId = fromAccountId)
       toAccountId !== undefined && (opts.conditions.toAccountId = toAccountId)
       ctId && (opts.conditions.ctId = ctId)
-
-      if (!opts.include) {
-        opts.include = [
-          {
-            model: service.account,
-            as: 'fromAccount',
-            attributes: ['userId', 'name'],
-            include: [{model: service.user, attributes: ['id', 'name']}]
-          },
-          {
-            model: service.account,
-            as: 'toAccount',
-            attributes: ['userId', 'name'],
-            include: [{model: service.user, attributes: ['id', 'name']}]
-          }
-        ]
-      }
     })
     .use(jmss(model))
 
