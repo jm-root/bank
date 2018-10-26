@@ -6,7 +6,6 @@ module.exports = function (service, opts) {
   const model = service.transfer
   let router = ms.router()
 
-  const fields = {exclude: ['fromUserId', 'toUserId']}
   router
     .add('/', 'get', async (opts = {}) => {
       const {data = {}} = opts
@@ -51,8 +50,6 @@ module.exports = function (service, opts) {
           toAccountId = doc.accountId
         }
       }
-
-      opts.fields || (opts.fields = fields)
 
       opts.order || (opts.order = [['id', 'DESC']])
 
