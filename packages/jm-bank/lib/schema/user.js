@@ -16,7 +16,7 @@ module.exports = function (sequelize, DataTypes) {
       createdAt: 'crtime',
       updatedAt: 'moditime',
       deletedAt: 'deltime',
-      paranoid: true,
+      // paranoid: true,
       comment: '用户'
     })
 

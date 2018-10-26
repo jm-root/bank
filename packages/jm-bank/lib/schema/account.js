@@ -17,8 +17,8 @@ module.exports = function (sequelize, DataTypes) {
       createdAt: 'crtime',
       updatedAt: 'moditime',
       deletedAt: 'deltime',
-      comment: '账户, 1个用户对应多个账户',
-      paranoid: true
+      // paranoid: true,
+      comment: '账户, 1个用户对应多个账户'
     })
 
   /**

@@ -20,7 +20,7 @@ module.exports = function (sequelize, DataTypes) {
       createdAt: 'crtime',
       updatedAt: false,
       deletedAt: 'deltime',
-      paranoid: true,
+      // paranoid: true,
       comment: '转账'
     })
 

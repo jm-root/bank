@@ -32,7 +32,7 @@ module.exports = function (sequelize, DataTypes) {
       createdAt: 'crtime',
       updatedAt: 'moditime',
       deletedAt: 'deltime',
-      paranoid: true,
+      // paranoid: true,
       comment: '余额, 对应1个账户和1个币种',
       indexes: [
         {

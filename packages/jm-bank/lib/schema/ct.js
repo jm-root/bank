@@ -21,7 +21,7 @@ module.exports = function (sequelize, DataTypes) {
       createdAt: 'crtime',
       updatedAt: 'moditime',
       deletedAt: 'deltime',
-      paranoid: true,
+      // paranoid: true,
       comment: '币种, 1个账号对应多个币种'
     })
 
