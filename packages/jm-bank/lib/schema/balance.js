@@ -110,9 +110,12 @@ module.exports = function (sequelize, DataTypes) {
 
     if (balance.amountValid < 0) throw error.err(Err.FA_OUTOF_BALANCE)
 
+    const account = await balance.getAccount()
     const o = {
-      amount,
-      balance: balance.get({plain: true})
+      userId: account.userId,
+      accountId: balance.accountId,
+      ctId: balance.ctId,
+      amount
     }
 
     service.emit('updateAmount', o)

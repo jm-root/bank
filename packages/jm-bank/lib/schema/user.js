@@ -65,7 +65,7 @@ module.exports = function (sequelize, DataTypes) {
         defaults: data
       })
       .spread((doc, created) => {
-        if (created) service.emit('user.create', data)
+        if (created) service.emit('user.create', doc)
         return doc
       })
   }
@@ -140,13 +140,22 @@ module.exports = function (sequelize, DataTypes) {
 
   /**
    * 用户之间转账
+   *
+   * fromUserId 和 toUserId 至少一个
+   *
+   * ctId 和 ctCode 至少一个
+   *
+   * allAmount 只能是 0 和 1，(为 1 时 忽略amount)
+   *
    * @param {Object} opts 配置参数
    * @example
    * opts参数:{
-   *   fromUserId: 转出用户(可选，如果不填，默认系统),
-   *   toUserId: 转入用户(可选，如果不填，默认系统),
-   *   ctCode: 币种Code(必填)
-   *   amount: 转出数量(必填)
+   *   fromUserId: 转出用户(不填则默认系统),
+   *   toUserId: 转入用户(不填则默认系统),
+   *   ctId: 币种Id
+   *   ctCode: 币种编码
+   *   amount: 转出数量
+   *   allAmount: 是否转出所有数量
    * }
    * @example
    * 成功返回: transfer对象
@@ -155,15 +164,11 @@ module.exports = function (sequelize, DataTypes) {
   model.transfer = async function (opts = {}) {
     logger.info(`user.transfer`, opts)
     const {service} = this
-    const {fromUserId = null, toUserId = null, ctCode, ctId} = opts
+    const {fromUserId = null, toUserId = null} = opts
 
     if (!fromUserId && !toUserId) throw error.err(Err.FA_INVALID_USER)
 
-    if (!ctCode && !ctId) throw error.err(Err.FA_INVALID_CT)
-
-    const ct = await service.ct.get({code: ctCode, id: ctId})
-
-    const data = {...opts, ctId: ct.id}
+    const data = {...opts}
 
     if (fromUserId) {
       const doc = await this.get(fromUserId)

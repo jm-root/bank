@@ -23,13 +23,24 @@ module.exports = function (sequelize, DataTypes) {
 
   /**
    * 账户之间转账
+   *
+   * fromAccountId 和 toAccountId 至少一个
+   *
+   * ctId 和 ctCode 至少一个
+   *
+   * allAmount 只能是 0 和 1，(为 1 时 忽略amount)
+   *
+   * fromAccountId 为空时, 忽略 allAmount
+   *
    * @param {Object} opts 配置参数
    * @example
    * opts参数:{
-   *   fromAccountId: 转出账户(可选，如果不填，默认系统),
-   *   toAccountId: 转入账户(可选，如果不填，默认系统),
-   *   ctId: 币种Id(必填)
-   *   amount: 转出数量(必填)
+   *   fromAccountId: 转出账户(不填则默认系统),
+   *   toAccountId: 转入账户(不填则默认系统),
+   *   ctId: 币种Id
+   *   ctCode: 币种编码
+   *   amount: 转出数量
+   *   allAmount: 是否转出所有数量
    * }
    * @example
    * 成功返回: transfer对象
@@ -38,17 +49,22 @@ module.exports = function (sequelize, DataTypes) {
   model.transfer = async function (opts = {}) {
     logger.debug(`account.transfer`, opts)
     const {service} = this
-    const {fromAccountId = null, toAccountId = null, ctId, amount = 0} = opts
+    let {fromAccountId, toAccountId, ctId, ctCode, amount = 0, allAmount = 0} = opts
 
     if (!fromAccountId && !toAccountId) throw error.err(Err.FA_INVALID_ACCOUNT)
 
-    if (!ctId) throw error.err(Err.FA_INVALID_CT)
+    if (!ctCode && !ctId) throw error.err(Err.FA_INVALID_CT)
 
-    if (!Number.isFinite(amount) || amount <= 0) {
+    if (amount && (!Number.isFinite(amount) || amount <= 0)) {
       throw error.err(Err.FA_INVALID_AMOUNT)
     }
 
-    await service.ct.get({id: ctId})
+    if (allAmount !== 0 && allAmount !== 1) {
+      throw error.err(Err.FA_INVALID_ALLAMOUNT)
+    }
+
+    const ct = await service.ct.get({code: ctCode, id: ctId})
+    ctId = ct.id
 
     const data = {...opts}
 
@@ -56,10 +72,19 @@ module.exports = function (sequelize, DataTypes) {
     let fromBalance = null
     let toAccount = null
     let toBalance = null
+
     if (fromAccountId) {
       fromAccount = await this.findById(fromAccountId)
       fromBalance = await service.balance.get({accountId: fromAccountId, ctId})
       data.fromUserId = fromAccount.userId
+    }
+
+    if (allAmount) {
+      if (!fromAccountId) throw error.err(Err.FA_OUTOF_BALANCE)
+      amount = fromBalance.amountValid
+      if (amount <= 0) {
+        throw error.err(Err.FA_OUTOF_BALANCE)
+      }
     }
 
     if (toAccountId) {

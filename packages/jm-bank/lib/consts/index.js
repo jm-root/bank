@@ -25,6 +25,10 @@ module.exports = {
       err: BaseErrCode++,
       msg: 'Invalid Amount'
     },
+    FA_INVALID_ALLAMOUNT: {
+      err: BaseErrCode++,
+      msg: 'Invalid allAmount, Must Be 0 Or 1'
+    },
     FA_INVALID_BALANCE: {
       err: BaseErrCode++,
       msg: 'Invalid Balance'
@@ -37,7 +41,7 @@ module.exports = {
       err: BaseErrCode++,
       msg: 'Self Transfer Forbidden'
     },
-    FA_DIFFERENT_CT:{
+    FA_DIFFERENT_CT: {
       err: BaseErrCode++,
       msg: 'Different Currency'
     }
