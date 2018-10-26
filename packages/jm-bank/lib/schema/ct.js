@@ -36,9 +36,10 @@ module.exports = function (sequelize, DataTypes) {
       attributes: ['id', 'code', 'name']
     })
     doc.forEach(ct => {
-      const {id, code} = ct
-      idMap[id] = ct
-      codeMap[code] = ct
+      const doc = ct.get({plain: true})
+      const {id, code} = doc
+      idMap[id] = doc
+      codeMap[code] = doc
     })
   }
 

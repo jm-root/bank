@@ -66,7 +66,7 @@ module.exports = function (sequelize, DataTypes) {
     const ct = await service.ct.get({code: ctCode, id: ctId})
     ctId = ct.id
 
-    const data = {...opts}
+    const data = {...opts, ctId}
 
     let fromAccount = null
     let fromBalance = null

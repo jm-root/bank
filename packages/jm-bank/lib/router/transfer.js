@@ -12,7 +12,7 @@ module.exports = function (service, opts) {
       data.rows || (data.rows = 100)
     })
     .add('/', 'get', async opts => {
-      const {data} = opts
+      const {data = {}} = opts
       const {ctCode, userId, fromUserId, toUserId} = data
       let {ctId, accountId, fromAccountId, toAccountId} = data
 
@@ -75,11 +75,6 @@ module.exports = function (service, opts) {
       if (!opts.include) {
         opts.include = [
           {
-            model: service.ct,
-            as: 'ct',
-            attributes: ['code', 'name']
-          },
-          {
             model: service.user,
             as: 'fromUser',
             attributes: ['id', 'name']
@@ -93,6 +88,14 @@ module.exports = function (service, opts) {
       }
     })
     .use(jmss(model))
+
+  model
+    .on('list', async (opts, doc) => {
+      for (const item of doc.rows) {
+        const ct = await service.ct.get({id: item.ctId})
+        item.ct = {code: ct.code, name: ct.name}
+      }
+    })
 
   return router
 }
