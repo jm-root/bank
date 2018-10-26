@@ -56,3 +56,5 @@ db [] mysql服务器Uri
 - 删除 locker 表
 - 删除 balance 表的 amountLocked 字段
 - 删除 user 表的 uid 字段
+- transfer 表 增加字段 fromUserId toUserId
+

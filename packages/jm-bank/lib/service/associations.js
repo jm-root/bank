@@ -9,8 +9,8 @@ module.exports = function (service, opts = {}) {
 
   transfer.belongsTo(account, {as: 'fromAccount'})
   transfer.belongsTo(account, {as: 'toAccount'})
-  // transfer.belongsTo(user, {as: 'fromUser'})
-  // transfer.belongsTo(user, {as: 'toUser'})
+  transfer.belongsTo(user, {as: 'fromUser'})
+  transfer.belongsTo(user, {as: 'toUser'})
   transfer.belongsTo(ct)
 
   user.hasMany(account)
