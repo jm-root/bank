@@ -50,3 +50,9 @@ npm run cluster
 基本配置 请参考[jm-server] (https://github.com/jm-root/jm-server)
 
 db [] mysql服务器Uri
+
+## 从 3.1.0 迁移 到 3.2.0
+
+- 删除 locker 表
+- 删除 balance 表的 amountLocked 字段
+- 删除 user 表的 uid 字段

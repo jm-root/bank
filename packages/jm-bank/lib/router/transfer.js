@@ -75,14 +75,16 @@ module.exports = function (service, opts) {
       if (!opts.include) {
         opts.include = [
           {
-            model: service.user,
-            as: 'fromUser',
-            attributes: ['id', 'name']
+            model: service.account,
+            as: 'fromAccount',
+            attributes: ['userId', 'name'],
+            include: [{model: service.user, attributes: ['id', 'name']}]
           },
           {
-            model: service.user,
-            as: 'toUser',
-            attributes: ['id', 'name']
+            model: service.account,
+            as: 'toAccount',
+            attributes: ['userId', 'name'],
+            include: [{model: service.user, attributes: ['id', 'name']}]
           }
         ]
       }
