@@ -30,7 +30,7 @@ module.exports = function (service, opts) {
           accountId = null
         } else {
           const doc = await service.user.get(userId)
-          accountId = doc.defaultAccountId
+          accountId = doc.accountId
         }
       }
 
@@ -39,7 +39,7 @@ module.exports = function (service, opts) {
           fromAccountId = null
         } else {
           const doc = await service.user.get(fromUserId)
-          fromAccountId = doc.defaultAccountId
+          fromAccountId = doc.accountId
         }
       }
 
@@ -48,7 +48,7 @@ module.exports = function (service, opts) {
           toAccountId = null
         } else {
           const doc = await service.user.get(toUserId)
-          toAccountId = doc.defaultAccountId
+          toAccountId = doc.accountId
         }
       }
 

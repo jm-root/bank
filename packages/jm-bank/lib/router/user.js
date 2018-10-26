@@ -12,7 +12,7 @@ module.exports = function (service, opts) {
       data.rows || (data.rows = 100)
     })
     .add('/', 'get', opts => {
-      opts.fields || (opts.fields = ['id', 'defaultAccountId', 'safeAccountId', 'name', 'status'])
+      opts.fields || (opts.fields = ['id', 'accountId', 'safeAccountId', 'name', 'status'])
       let data = opts.data
       opts.conditions || (opts.conditions = {})
       if (data.userId) {
@@ -20,7 +20,7 @@ module.exports = function (service, opts) {
       }
     })
     .add('/:id', 'get', opts => {
-      opts.fields || (opts.fields = ['id', 'defaultAccountId', 'safeAccountId', 'name', 'status'])
+      opts.fields || (opts.fields = ['id', 'accountId', 'safeAccountId', 'name', 'status'])
     })
     .use(jmss(model))
 

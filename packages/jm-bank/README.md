@@ -50,7 +50,3 @@ npm run cluster
 基本配置 请参考[jm-server] (https://github.com/jm-root/jm-server)
 
 db [] mysql服务器Uri
-
-## 从 3.0 升级到 4.0
-
-user 表 accountId 改为 defaultAccountId

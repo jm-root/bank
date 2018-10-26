@@ -10,7 +10,7 @@ beforeAll(async () => {
   service = $.balance
   ct = await $.ct.get(ct)
   user = await $.user.get(user.id)
-  balance = await service.get({accountId: user.defaultAccountId, ctId: ct.id})
+  balance = await service.get({accountId: user.accountId, ctId: ct.id})
 })
 
 describe('service.balance', async () => {

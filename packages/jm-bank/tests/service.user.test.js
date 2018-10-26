@@ -22,10 +22,10 @@ describe('service.user', async () => {
   test('get', async () => {
     let doc = await service.get(id)
     expect(doc.id === id).toBeTruthy()
-    const defaultAccount = await doc.getDefaultAccount()
+    const account = await doc.getAccount()
     const safeAccount = await doc.getSafeAccount()
-    const user = await defaultAccount.getUser()
-    expect(defaultAccount.userId === id && safeAccount.userId === id).toBeTruthy()
+    const user = await account.getUser()
+    expect(account.userId === id && safeAccount.userId === id).toBeTruthy()
   })
 
   test('query', async () => {

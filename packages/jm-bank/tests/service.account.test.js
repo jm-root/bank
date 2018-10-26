@@ -21,12 +21,12 @@ describe('service.account', async () => {
   })
 
   test('to', async () => {
-    const doc = await service.transfer({toAccountId: user.defaultAccountId, ctId: ct.id, amount, memo: '测试货币发行'})
+    const doc = await service.transfer({toAccountId: user.accountId, ctId: ct.id, amount, memo: '测试货币发行'})
     expect(doc.amount === amount).toBeTruthy()
   })
 
   test('from', async () => {
-    const doc = await service.transfer({fromAccountId: user.defaultAccountId, ctId: ct.id, amount, memo: '测试货币回收'})
+    const doc = await service.transfer({fromAccountId: user.accountId, ctId: ct.id, amount, memo: '测试货币回收'})
     expect(doc.amount === amount).toBeTruthy()
   })
 

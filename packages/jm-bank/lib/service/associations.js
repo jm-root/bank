@@ -14,7 +14,7 @@ module.exports = function (service, opts = {}) {
   transfer.belongsTo(ct)
 
   user.hasMany(account)
-  user.belongsTo(account, {as: 'defaultAccount', constraints: false})
+  user.belongsTo(account, {as: 'account', constraints: false})
   user.belongsTo(account, {as: 'safeAccount', constraints: false})
 
 }

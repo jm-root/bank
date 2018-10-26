@@ -26,17 +26,17 @@ module.exports = function (sequelize, DataTypes) {
     const data = {userId: user.id}
 
     let doc = await service.account.create(data, {transaction})
-    const defaultAccountId = doc.id
+    const accountId = doc.id
 
     doc = await service.account.create(data, {transaction})
     const safeAccountId = doc.id
 
-    user.defaultAccountId = defaultAccountId
+    user.accountId = accountId
     user.safeAccountId = safeAccountId
 
     await model.update(
       {
-        defaultAccountId,
+        accountId,
         safeAccountId
       },
       {
@@ -75,9 +75,9 @@ module.exports = function (sequelize, DataTypes) {
    * @param id
    * @returns {Promise<*>}
    */
-  model.getDefaultAccount = async function (id) {
+  model.getAccount = async function (id) {
     const doc = await this.get(id)
-    return doc.getDefaultAccount()
+    return doc.getAccount()
   }
 
   /**
@@ -114,7 +114,7 @@ module.exports = function (sequelize, DataTypes) {
     }
 
     const user = await this.get(userId)
-    let accountId = user.defaultAccountId
+    let accountId = user.accountId
     if (safe) accountId = user.safeAccountId
 
     let conditions = {accountId}
@@ -167,12 +167,12 @@ module.exports = function (sequelize, DataTypes) {
 
     if (fromUserId) {
       const doc = await this.get(fromUserId)
-      data.fromAccountId = doc.defaultAccountId
+      data.fromAccountId = doc.accountId
     }
 
     if (toUserId) {
       const doc = await this.get(toUserId)
-      data.toAccountId = doc.defaultAccountId
+      data.toAccountId = doc.accountId
     }
 
     return await service.account.transfer(data)
