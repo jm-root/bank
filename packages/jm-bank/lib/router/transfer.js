@@ -78,6 +78,11 @@ module.exports = function (service, opts) {
       if (!opts.include) {
         opts.include = [
           {
+            model: service.ct,
+            as: 'ct',
+            attributes: ['code', 'name']
+          },
+          {
             model: service.user,
             as: 'fromUser',
             attributes: ['id', 'name']
