@@ -53,6 +53,8 @@ module.exports = function (sequelize, DataTypes) {
 
     if (!fromAccountId && !toAccountId) throw error.err(Err.FA_INVALID_ACCOUNT)
 
+    if (fromAccountId === toAccountId) throw error.err(Err.FA_SELF_TRANSFER)
+
     if (!ctCode && !ctId) throw error.err(Err.FA_INVALID_CT)
 
     if (amount && (!Number.isFinite(amount) || amount <= 0)) {

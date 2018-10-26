@@ -141,7 +141,7 @@ module.exports = function (sequelize, DataTypes) {
   /**
    * 用户之间转账
    *
-   * fromUserId 和 toUserId 至少一个
+   * fromUserId toUserId fromAccountId 和 toAccountId 至少一个
    *
    * ctId 和 ctCode 至少一个
    *
@@ -152,6 +152,8 @@ module.exports = function (sequelize, DataTypes) {
    * opts参数:{
    *   fromUserId: 转出用户(不填则默认系统),
    *   toUserId: 转入用户(不填则默认系统),
+   *   fromAccountId: 转出账户(不填则默认系统),
+   *   toAccountId: 转入账户(不填则默认系统),
    *   ctId: 币种Id
    *   ctCode: 币种编码
    *   amount: 转出数量
@@ -164,9 +166,7 @@ module.exports = function (sequelize, DataTypes) {
   model.transfer = async function (opts = {}) {
     logger.info(`user.transfer`, opts)
     const {service} = this
-    const {fromUserId = null, toUserId = null} = opts
-
-    if (!fromUserId && !toUserId) throw error.err(Err.FA_INVALID_USER)
+    const {fromUserId = null, toUserId = null,} = opts
 
     const data = {...opts}
 

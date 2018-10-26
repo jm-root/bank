@@ -8,6 +8,5 @@ module.exports = {
   'Invalid allAmount, Must Be 0 Or 1': 'allAmount参数只能是0或1',
   'Invalid Balance': '无效余额',
   'Out of Balance': '余额不足',
-  'Self Transfer Forbidden': '禁止转账给同一账户',
-  'Different Currency': '禁止不同币种互相转账'
+  'Self Transfer Forbidden': '禁止转账给同一账户'
 }
