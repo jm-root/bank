@@ -1,7 +1,8 @@
-const _ = require('lodash')
 const error = require('jm-err')
 const consts = require('../consts')
 const Err = consts.Err
+const log = require('jm-log4js')
+const logger = log.getLogger('bank')
 
 module.exports = function (sequelize, DataTypes) {
   const model = sequelize.define('balance',
@@ -86,10 +87,11 @@ module.exports = function (sequelize, DataTypes) {
    * 成功返回: balance对象
    * @return {Promise}
    */
-  model.updateAmount = async function ({id, amount = 0}) {
+  model.updateAmount = async function ({balance, id, amount = 0}) {
+    logger.debug('balance.updateAmount', {id: id || balance.id, amount})
     const {service} = this
 
-    if (!id) {
+    if (!id && !balance) {
       throw error.err(Err.FA_INVALID_BALANCE)
     }
 
@@ -97,7 +99,9 @@ module.exports = function (sequelize, DataTypes) {
       throw error.err(Err.FA_INVALID_AMOUNT)
     }
 
-    const balance = await this.findById(id)
+    if (!balance) {
+      balance = await this.findById(id)
+    }
     if (balance.amountValid + amount < 0) throw error.err(Err.FA_OUTOF_BALANCE)
 
     await balance.increment({amount})
@@ -121,11 +125,12 @@ module.exports = function (sequelize, DataTypes) {
    * 成功返回: balance对象
    * @return {Promise}
    */
-  model.put = function ({id, amount = 0}) {
+  model.put = function (opts = {}) {
+    const {amount = 0} = opts
     if (!Number.isFinite(amount) || amount < 0) {
       throw error.err(Err.FA_INVALID_AMOUNT)
     }
-    return this.updateAmount({id, amount})
+    return this.updateAmount(opts)
   }
 
   /**
@@ -140,11 +145,13 @@ module.exports = function (sequelize, DataTypes) {
    * 成功返回: balance对象
    * @return {Promise}
    */
-  model.take = function ({id, amount = 0}) {
+  model.take = function (opts = {}) {
+    const {amount = 0} = opts
     if (!Number.isFinite(amount) || amount < 0) {
       throw error.err(Err.FA_INVALID_AMOUNT)
     }
-    return this.updateAmount({id, amount: -amount})
+    const data = {...opts, amount: -amount}
+    return this.updateAmount(data)
   }
 
   return model

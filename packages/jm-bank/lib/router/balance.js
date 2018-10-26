@@ -7,6 +7,10 @@ module.exports = function (service, opts) {
   let router = ms.router()
 
   router
+    .add('/', 'get', async (opts = {}) => {
+      const {data = {}} = opts
+      data.rows || (data.rows = 100)
+    })
     .add('/', 'get', opts => {
       opts.fields || (opts.fields = ['id', 'accountId', 'ctId', 'amount', 'amountValid', 'overdraw'])
     })

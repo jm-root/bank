@@ -7,8 +7,6 @@ module.exports = function (service, opts = {}) {
   balance.belongsTo(ct)
   balance.belongsTo(account)
 
-  transfer.belongsTo(balance, {as: 'fromBalance'})
-  transfer.belongsTo(balance, {as: 'toBalance'})
   transfer.belongsTo(account, {as: 'fromAccount'})
   transfer.belongsTo(account, {as: 'toAccount'})
   transfer.belongsTo(user, {as: 'fromUser'})

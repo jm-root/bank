@@ -38,27 +38,47 @@ module.exports = function (sequelize, DataTypes) {
   model.transfer = async function (opts = {}) {
     logger.debug(`account.transfer`, opts)
     const {service} = this
-    const {fromAccountId = null, toAccountId = null, ctId} = opts
+    const {fromAccountId = null, toAccountId = null, ctId, amount = 0} = opts
 
     if (!fromAccountId && !toAccountId) throw error.err(Err.FA_INVALID_ACCOUNT)
 
     if (!ctId) throw error.err(Err.FA_INVALID_CT)
 
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw error.err(Err.FA_INVALID_AMOUNT)
+    }
+
     await service.ct.get({id: ctId})
 
     const data = {...opts}
 
+    let fromAccount = null
+    let fromBalance = null
+    let toAccount = null
+    let toBalance = null
     if (fromAccountId) {
-      const doc = await service.balance.get({accountId: fromAccountId, ctId})
-      data.fromBalanceId = doc.id
+      fromAccount = await this.findById(fromAccountId)
+      fromBalance = await service.balance.get({accountId: fromAccountId, ctId})
+      data.fromUserId = fromAccount.userId
     }
 
     if (toAccountId) {
-      const doc = await service.balance.get({accountId: toAccountId, ctId})
-      data.toBalanceId = doc.id
+      toAccount = await this.findById(toAccountId)
+      toBalance = await service.balance.get({accountId: toAccountId, ctId})
+      data.toUserId = toAccount.userId
     }
 
-    return service.transfer.transfer(data)
+    if (fromBalance) {
+      const doc = await service.balance.take({balance: fromBalance, amount})
+      data.fromAccountBalance = doc.amount
+    }
+
+    if (toBalance) {
+      const doc = await service.balance.put({balance: toBalance, amount})
+      data.toAccountBalance = doc.amount
+    }
+
+    return service.transfer.create(data)
   }
 
   return model

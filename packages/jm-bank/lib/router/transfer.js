@@ -6,8 +6,12 @@ module.exports = function (service, opts) {
   const model = service.transfer
   let router = ms.router()
 
-  const fields = ['id', 'amount', 'memo', 'fromBalanceAmount', 'toBalanceAmount']
+  const fields = ['id', 'amount', 'memo', 'fromAccountId', 'toAccountId', 'fromAccountBalance', 'toAccountBalance']
   router
+    .add('/', 'get', async (opts = {}) => {
+      const {data = {}} = opts
+      data.rows || (data.rows = 100)
+    })
     .add('/', 'get', async opts => {
       const {data} = opts
       const {ctCode, userId, fromUserId, toUserId} = data
@@ -26,7 +30,7 @@ module.exports = function (service, opts) {
           accountId = null
         } else {
           const doc = await service.user.get(userId)
-          accountId = doc.accountId
+          accountId = doc.defaultAccountId
         }
       }
 
@@ -35,7 +39,7 @@ module.exports = function (service, opts) {
           fromAccountId = null
         } else {
           const doc = await service.user.get(fromUserId)
-          fromAccountId = doc.accountId
+          fromAccountId = doc.defaultAccountId
         }
       }
 
@@ -44,7 +48,7 @@ module.exports = function (service, opts) {
           toAccountId = null
         } else {
           const doc = await service.user.get(toUserId)
-          toAccountId = doc.accountId
+          toAccountId = doc.defaultAccountId
         }
       }
 
@@ -74,38 +78,14 @@ module.exports = function (service, opts) {
       if (!opts.include) {
         opts.include = [
           {
-            model: service.balance,
-            as: 'fromBalance',
-            attributes: ['accountId'],
-            include: [
-              {
-                model: service.account,
-                attributes: ['id', 'name'],
-                include: [
-                  {
-                    model: service.user,
-                    attributes: ['id', 'name']
-                  }
-                ]
-              }
-            ]
+            model: service.user,
+            as: 'fromUser',
+            attributes: ['id', 'name']
           },
           {
-            model: service.balance,
-            as: 'toBalance',
-            attributes: ['accountId'],
-            include: [
-              {
-                model: service.account,
-                attributes: ['id', 'name'],
-                include: [
-                  {
-                    model: service.user,
-                    attributes: ['id', 'name']
-                  }
-                ]
-              }
-            ]
+            model: service.user,
+            as: 'toUser',
+            attributes: ['id', 'name']
           }
         ]
       }

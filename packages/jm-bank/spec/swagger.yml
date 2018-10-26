@@ -138,14 +138,14 @@ components:
         fromUserId:
           type: string
           description: 转出用户Id
-        fromBalanceAmount:
+        fromAccountBalance:
           type: integer
           format: int64
           description: 转出用户余额
         toUserId:
           type: string
           description: 转入用户Id
-        toBalanceAmount:
+        toAccountBalance:
           type: integer
           format: int64
           description: 转出用户余额
