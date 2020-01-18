@@ -1,4 +1,4 @@
-require('log4js').configure(require('path').join(__dirname, 'log4js.json'))
+require('log4js').configure(require('./log4js'))
+process.env.NODE_CONFIG_DIR = require('path').join(__dirname)
 const config = require('config')
-if (config.disable_mq) delete config.modules['jm-bank-mq']
 module.exports = config

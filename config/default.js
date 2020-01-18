@@ -1,8 +1,8 @@
 module.exports = {
+  lng: 'zh_CN',
   modules: {
     bank: {
       module: 'jm-bank'
-    },
-    'jm-bank-mq': {}
+    }
   }
 }
