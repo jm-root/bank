@@ -1,4 +1,4 @@
-const jmss = require('jm-ms-sequlize')
+const jmss = require('jm-ms-sequelize')
 const MS = require('jm-ms-core')
 const ms = new MS()
 

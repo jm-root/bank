@@ -1,6 +1,6 @@
 const $ = require('./service')
 
-let {user, ct} = require('./consts')
+let { user, ct } = require('./consts')
 
 let service = null
 let router = null
@@ -32,14 +32,14 @@ describe('router', async () => {
 
     doc = await tUser({
       toUserId: user.id,
-      amount: 100,
+      amount: 100
     })
     expect(doc).toBeTruthy()
 
     doc = await tUser({
       fromUserId: user.id,
       toUserId: user.id1,
-      amount: 100,
+      amount: 100
     })
     expect(doc).toBeTruthy()
 
@@ -47,12 +47,11 @@ describe('router', async () => {
       doc = await tUser({
         fromUserId: user.id2,
         toUserId: user.id,
-        amount: 100,
+        amount: 100
       })
     } catch (e) {
       expect(e).toBeTruthy()
     }
-
   })
 
   test('transfer by account', async () => {
@@ -66,7 +65,7 @@ describe('router', async () => {
 
     doc = await tUser({
       toAccountId: accountId,
-      amount: 100,
+      amount: 100
     })
     expect(doc).toBeTruthy()
 
@@ -86,7 +85,6 @@ describe('router', async () => {
     } catch (e) {
       expect(e).toBeTruthy()
     }
-
   })
 
   test('transfer safe account', async () => {
@@ -97,23 +95,21 @@ describe('router', async () => {
 
     doc = await tUser({
       toUserId: user.id,
-      amount: 100,
+      amount: 100
     })
     expect(doc).toBeTruthy()
 
     doc = await tUser({
       fromUserId: user.id,
       toAccountId: accountId,
-      amount: 100,
+      amount: 100
     })
     expect(doc).toBeTruthy()
   })
 
   test('transfer error', async () => {
-    let doc = null
-
     try {
-      doc = await tUser({
+      await tUser({
         amount: 100
       })
     } catch (e) {
@@ -121,15 +117,13 @@ describe('router', async () => {
     }
 
     try {
-      doc = await tUser({
+      await tUser({
         fromUserId: user.id,
         toUserId: user.id,
-        amount: 100,
+        amount: 100
       })
     } catch (e) {
       expect(e).toBeTruthy()
     }
-
   })
-
 })

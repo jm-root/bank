@@ -23,15 +23,14 @@
   "homepage": "https://github.com/jm-root/bank",
   "dependencies": {
     "cls-hooked": "^4.2.2",
-    "jm-ms-sequlize": "1.0.7",
+    "jm-ms-sequelize": "^1.0.9",
     "jm-ms-wrapper": "^1.0.1",
-    "moment": "^2.18.1",
-    "mysql2": "^1.4.0",
-    "sequelize": "^4.4.2"
+    "mysql2": "^2.1.0",
+    "sequelize": "^5.21.3"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
-    "bson": "^3.0.2"
+    "bson": "^4.0.2"
   },
   "jest": {
     "testEnvironment": "node"

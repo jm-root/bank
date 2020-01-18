@@ -11,10 +11,10 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.BIGINT,
         defaultValue: 0,
         allowNull: false,
-        validate: {min: 0},
+        validate: { min: 0 },
         comment: '允许透支额度,例如允许透支100, amount允许>=-100'
       },
-      amount: {type: DataTypes.BIGINT, defaultValue: 0, allowNull: false, comment: '实际余额'},
+      amount: { type: DataTypes.BIGINT, defaultValue: 0, allowNull: false, comment: '实际余额' },
       amountValid: {
         type: DataTypes.BIGINT,
         defaultValue: 0,
@@ -50,8 +50,7 @@ module.exports = function (sequelize, DataTypes) {
    * @param ctId
    * @returns {Promise<*>}
    */
-  model.get = async function ({accountId, ctId}) {
-
+  model.get = async function ({ accountId, ctId }) {
     if (!accountId) {
       throw error.err(Err.FA_INVALID_ACCOUNT)
     }
@@ -87,9 +86,9 @@ module.exports = function (sequelize, DataTypes) {
    * 成功返回: balance对象
    * @return {Promise}
    */
-  model.updateAmount = async function ({balance, id, amount = 0}) {
-    logger.debug('balance.updateAmount', {id: id || balance.id, amount})
-    const {service} = this
+  model.updateAmount = async function ({ balance, id, amount = 0 }) {
+    logger.debug('balance.updateAmount', { id: id || balance.id, amount })
+    const { service } = this
 
     if (!id && !balance) {
       throw error.err(Err.FA_INVALID_BALANCE)
@@ -100,11 +99,11 @@ module.exports = function (sequelize, DataTypes) {
     }
 
     if (!balance) {
-      balance = await this.findById(id)
+      balance = await this.findByPk(id)
     }
     if (balance.amountValid + amount < 0) throw error.err(Err.FA_OUTOF_BALANCE)
 
-    await balance.increment({amount})
+    await balance.increment({ amount })
 
     await balance.reload()
 
@@ -136,7 +135,7 @@ module.exports = function (sequelize, DataTypes) {
    * @return {Promise}
    */
   model.put = function (opts = {}) {
-    const {amount = 0} = opts
+    const { amount = 0 } = opts
     if (!Number.isFinite(amount) || amount < 0) {
       throw error.err(Err.FA_INVALID_AMOUNT)
     }
@@ -156,11 +155,11 @@ module.exports = function (sequelize, DataTypes) {
    * @return {Promise}
    */
   model.take = function (opts = {}) {
-    const {amount = 0} = opts
+    const { amount = 0 } = opts
     if (!Number.isFinite(amount) || amount < 0) {
       throw error.err(Err.FA_INVALID_AMOUNT)
     }
-    const data = {...opts, amount: -amount}
+    const data = { ...opts, amount: -amount }
     return this.updateAmount(data)
   }
 

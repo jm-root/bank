@@ -1,5 +1,5 @@
 const $ = require('./service')
-const {code, name} = require('./consts').ct
+const { code, name } = require('./consts').ct
 
 let service = null
 beforeAll(async () => {
@@ -11,7 +11,7 @@ describe('ct', async () => {
   test('find and create', async () => {
     let doc = null
     try {
-      doc = await service.get({code})
+      doc = await service.get({ code })
     } catch (e) {
       doc = await service.create({
         code,

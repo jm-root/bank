@@ -1,4 +1,4 @@
-const jmss = require('jm-ms-sequlize')
+const jmss = require('jm-ms-sequelize')
 const MS = require('jm-ms-core')
 const ms = new MS()
 
@@ -8,13 +8,13 @@ module.exports = function (service, opts) {
 
   router
     .add('/', 'get', async (opts = {}) => {
-      const {data = {}} = opts
+      const { data = {} } = opts
       data.rows || (data.rows = 100)
     })
     .add('/', 'get', async opts => {
-      const {data = {}} = opts
-      const {ctCode, userId, fromUserId, toUserId} = data
-      let {ctId, accountId, fromAccountId, toAccountId} = data
+      const { data = {} } = opts
+      const { ctCode, userId, fromUserId, toUserId } = data
+      let { ctId, accountId, fromAccountId, toAccountId } = data
 
       if (ctId || ctCode) {
         const doc = await service.ct.get({
@@ -78,8 +78,8 @@ module.exports = function (service, opts) {
     .on('list', async (opts, doc) => {
       if (doc && doc.rows) {
         for (const item of doc.rows) {
-          const ct = await service.ct.get({id: item.ctId})
-          item.ct = {code: ct.code, name: ct.name}
+          const ct = await service.ct.get({ id: item.ctId })
+          item.ct = { code: ct.code, name: ct.name }
         }
       }
     })

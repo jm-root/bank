@@ -19,7 +19,7 @@ module.exports = function (opts, app) {
 
     bind: async function (name, uri) {
       uri || (uri = `/${name}`)
-      let doc = await ms.client({uri: this.gateway + uri})
+      let doc = await ms.client({ uri: this.gateway + uri })
       this[name] = doc
       return doc
     }
@@ -39,7 +39,7 @@ module.exports = function (opts, app) {
   let bank = app.modules.bank
 
   let send = async function (topic, message) {
-    return o.mq.post(`/${topic}`, {message})
+    return o.mq.post(`/${topic}`, { message })
       .catch(e => {
         logger.error(`send mq fail. topic: ${topic} message: ${JSON.stringify(message)}`)
         logger.error(e)

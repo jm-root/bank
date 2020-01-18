@@ -1,4 +1,3 @@
-const {ObjectId} = require('bson')
 const $ = require('./service')
 
 /**
@@ -6,25 +5,22 @@ const $ = require('./service')
  * @returns {Promise<void>}
  */
 async function upgrade () {
-
   // 补充 transfer 表的 fromUserId toUserId
   let doc = await $.transfer.findAll()
   for (const item of doc) {
-    let {id, fromUserId, toUserId, fromAccountId, toAccountId} = item
+    let { id, fromUserId, toUserId, fromAccountId, toAccountId } = item
     if (fromUserId || toUserId) continue
     if (fromAccountId) {
-      const doc = await $.account.findById(fromAccountId)
+      const doc = await $.account.findByPk(fromAccountId)
       item.fromUserId = doc.userId
     }
     if (toAccountId) {
-      const doc = await $.account.findById(toAccountId)
+      const doc = await $.account.findByPk(toAccountId)
       item.toUserId = doc.userId
     }
     console.log(id, item.fromUserId, item.toUserId)
     await item.save()
   }
-
 }
 
 upgrade()
-

@@ -7,10 +7,10 @@ const logger = log.getLogger('bank')
 module.exports = function (sequelize, DataTypes) {
   const model = sequelize.define('account',
     {
-      password: {type: DataTypes.STRING(128), comment: '转帐密码'},
-      salt: {type: DataTypes.STRING(128), comment: '转帐密钥'},
-      name: {type: DataTypes.STRING(32), comment: '账户名称，用户自己可以修改'},
-      status: {type: DataTypes.INTEGER, defaultValue: 1, validate: {min: 0, max: 2}, comment: '账号状态 0:冻结 1:正常 2:注销'}
+      password: { type: DataTypes.STRING(128), comment: '转帐密码' },
+      salt: { type: DataTypes.STRING(128), comment: '转帐密钥' },
+      name: { type: DataTypes.STRING(32), comment: '账户名称，用户自己可以修改' },
+      status: { type: DataTypes.INTEGER, defaultValue: 1, validate: { min: 0, max: 2 }, comment: '账号状态 0:冻结 1:正常 2:注销' }
     },
     {
       tableName: 'account',
@@ -48,8 +48,8 @@ module.exports = function (sequelize, DataTypes) {
    */
   model.transfer = async function (opts = {}) {
     logger.debug(`account.transfer`, opts)
-    const {service} = this
-    let {fromAccountId, toAccountId, ctId, ctCode, amount = 0, allAmount = 0} = opts
+    const { service } = this
+    let { fromAccountId, toAccountId, ctId, ctCode, amount = 0, allAmount = 0 } = opts
 
     if (!fromAccountId && !toAccountId) throw error.err(Err.FA_INVALID_ACCOUNT)
 
@@ -65,10 +65,10 @@ module.exports = function (sequelize, DataTypes) {
       throw error.err(Err.FA_INVALID_ALLAMOUNT)
     }
 
-    const ct = await service.ct.get({code: ctCode, id: ctId})
+    const ct = await service.ct.get({ code: ctCode, id: ctId })
     ctId = ct.id
 
-    const data = {...opts, ctId}
+    const data = { ...opts, ctId }
 
     let fromAccount = null
     let fromBalance = null
@@ -76,8 +76,8 @@ module.exports = function (sequelize, DataTypes) {
     let toBalance = null
 
     if (fromAccountId) {
-      fromAccount = await this.findById(fromAccountId)
-      fromBalance = await service.balance.get({accountId: fromAccountId, ctId})
+      fromAccount = await this.findByPk(fromAccountId)
+      fromBalance = await service.balance.get({ accountId: fromAccountId, ctId })
       data.fromUserId = fromAccount.userId
     }
 
@@ -91,18 +91,18 @@ module.exports = function (sequelize, DataTypes) {
     }
 
     if (toAccountId) {
-      toAccount = await this.findById(toAccountId)
-      toBalance = await service.balance.get({accountId: toAccountId, ctId})
+      toAccount = await this.findByPk(toAccountId)
+      toBalance = await service.balance.get({ accountId: toAccountId, ctId })
       data.toUserId = toAccount.userId
     }
 
     if (fromBalance) {
-      const doc = await service.balance.take({balance: fromBalance, amount})
+      const doc = await service.balance.take({ balance: fromBalance, amount })
       data.fromAccountBalance = doc.amount
     }
 
     if (toBalance) {
-      const doc = await service.balance.put({balance: toBalance, amount})
+      const doc = await service.balance.put({ balance: toBalance, amount })
       data.toAccountBalance = doc.amount
     }
 
@@ -110,7 +110,7 @@ module.exports = function (sequelize, DataTypes) {
 
     const o = {
       ...data,
-      ...doc.get({plain: true})
+      ...doc.get({ plain: true })
     }
 
     service.emit('transfer', o)

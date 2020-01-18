@@ -1,4 +1,4 @@
-const {ObjectId} = require('bson')
+const { ObjectId } = require('bson')
 const $ = require('./service')
 
 function createId () {
@@ -28,18 +28,16 @@ async function transfer () {
 
 async function init () {
   for (let i = 0; i < 100; i++) {
-    // await initCT()
+    await initCT()
   }
 
   for (let i = 0; i < 100 * 10000; i++) {
-    // await initUser()
+    await initUser()
   }
 
   for (let i = 0; i < 100 * 10000; i++) {
     await transfer()
   }
-
 }
 
 init()
-

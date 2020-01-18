@@ -1,22 +1,17 @@
-const _ = require('lodash')
 const log = require('jm-log4js')
-const event = require('jm-event')
-const error = require('jm-err')
+const { EventEmitter } = require('jm-event')
 const fs = require('fs')
 const path = require('path')
-const DB = require('./db')
 const DAO = require('./dao')
 const Associations = require('./associations')
 const t = require('../locale')
-const consts = require('../consts')
 
-const Err = consts.Err
 const logger = log.getLogger('bank')
 
 /**
  * Class representing a bank.
  */
-class Bank {
+class Bank extends EventEmitter {
   /**
    * Create a bank.
    * @param {Object} opts
@@ -26,11 +21,13 @@ class Bank {
      * }
    */
   constructor (opts = {}) {
-    event.enableEvent(this)
+    super({ async: true })
+    this.onReady()
+
     this.logger = logger
     this.t = t
     this.ready = false
-    this.db = DB(opts)
+    this.db = require('./mysql')(opts)
     let db = this.db
 
     // 批量引入model
@@ -57,16 +54,15 @@ class Bank {
       })
   }
 
-  onReady () {
-    let self = this
-    return new Promise(function (resolve, reject) {
-      if (self.ready) return resolve(self.ready)
-      self.once('ready', function () {
+  async onReady () {
+    if (this.ready) return
+    return new Promise(resolve => {
+      this.once('ready', () => {
+        this.ready = true
         resolve()
       })
     })
   }
-
 }
 
 module.exports = Bank

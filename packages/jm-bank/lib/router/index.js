@@ -9,8 +9,7 @@ const account = require('./account')
 const balance = require('./balance')
 const ct = require('./ct')
 
-let Err = error.Err
-let ms = new MS()
+const ms = new MS()
 
 /**
  * @apiDefine Error
@@ -39,7 +38,7 @@ module.exports = function (opts = {}) {
   }
 
   routes.transfer = function (opts = {}) {
-    const {data} = opts
+    const { data } = opts
     return service.user.transfer(data)
   }
 

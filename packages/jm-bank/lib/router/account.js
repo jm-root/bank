@@ -1,4 +1,4 @@
-const jmss = require('jm-ms-sequlize')
+const jmss = require('jm-ms-sequelize')
 const MS = require('jm-ms-core')
 const ms = new MS()
 
@@ -8,7 +8,7 @@ module.exports = function (service, opts) {
 
   router
     .add('/', 'get', async (opts = {}) => {
-      const {data = {}} = opts
+      const { data = {} } = opts
       data.rows || (data.rows = 100)
     })
     .add('/', 'get', opts => {

@@ -7,9 +7,9 @@ const logger = log.getLogger('bank')
 module.exports = function (sequelize, DataTypes) {
   const model = sequelize.define('user',
     {
-      id: {type: DataTypes.STRING(32), primaryKey: true},
-      name: {type: DataTypes.STRING(32), comment: '用户名'},
-      status: {type: DataTypes.INTEGER.UNSIGNED, defaultValue: 1, validate: {min: 0, max: 1}, comment: '状态(0:无效,1:有效)'}
+      id: { type: DataTypes.STRING(32), primaryKey: true },
+      name: { type: DataTypes.STRING(32), comment: '用户名' },
+      status: { type: DataTypes.INTEGER.UNSIGNED, defaultValue: 1, validate: { min: 0, max: 1 }, comment: '状态(0:无效,1:有效)' }
     },
     {
       tableName: 'user',
@@ -21,14 +21,14 @@ module.exports = function (sequelize, DataTypes) {
     })
 
   // 创建用户时，自动创建一个默认账户和一个保险账户
-  model.afterCreate(async (user, {transaction}) => {
-    const {service} = model
-    const data = {userId: user.id}
+  model.afterCreate(async (user, { transaction }) => {
+    const { service } = model
+    const data = { userId: user.id }
 
-    let doc = await service.account.create(data, {transaction})
+    let doc = await service.account.create(data, { transaction })
     const accountId = doc.id
 
-    doc = await service.account.create(data, {transaction})
+    doc = await service.account.create(data, { transaction })
     const safeAccountId = doc.id
 
     user.accountId = accountId
@@ -54,11 +54,11 @@ module.exports = function (sequelize, DataTypes) {
    * @returns {Promise<*>}
    */
   model.get = async function (id) {
-    const {service} = model
+    const { service } = model
     if (!id) {
       throw error.err(Err.FA_INVALID_USER)
     }
-    const data = {id}
+    const data = { id }
     return this
       .findOrCreate({
         where: data,
@@ -106,8 +106,8 @@ module.exports = function (sequelize, DataTypes) {
    */
   model.query = async function (opts = {}) {
     logger.debug(`user.query`, opts)
-    const {service} = this
-    const {userId, ctCode, ctId, safe} = opts
+    const { service } = this
+    const { userId, ctCode, ctId, safe } = opts
 
     if (!userId) {
       throw error.err(Err.FA_INVALID_USER)
@@ -117,9 +117,9 @@ module.exports = function (sequelize, DataTypes) {
     let accountId = user.accountId
     if (safe) accountId = user.safeAccountId
 
-    let conditions = {accountId}
+    let conditions = { accountId }
     if (ctId || ctCode) {
-      const doc = await service.ct.get({id: ctId, code: ctCode})
+      const doc = await service.ct.get({ id: ctId, code: ctCode })
       conditions.ctId = doc.id
     }
 
@@ -128,7 +128,7 @@ module.exports = function (sequelize, DataTypes) {
     })
     const data = {}
     for (const balance of balances) {
-      const ct = await service.ct.get({id: balance.ctId})
+      const ct = await service.ct.get({ id: balance.ctId })
       data[ct.code] = {
         overdraw: balance.overdraw || 0,
         amount: balance.amount || 0,
@@ -165,10 +165,10 @@ module.exports = function (sequelize, DataTypes) {
    */
   model.transfer = async function (opts = {}) {
     logger.info(`user.transfer`, opts)
-    const {service} = this
-    const {fromUserId = null, toUserId = null,} = opts
+    const { service } = this
+    const { fromUserId = null, toUserId = null } = opts
 
-    const data = {...opts}
+    const data = { ...opts }
 
     if (fromUserId) {
       const doc = await this.get(fromUserId)
@@ -180,7 +180,7 @@ module.exports = function (sequelize, DataTypes) {
       data.toAccountId = doc.accountId
     }
 
-    return await service.account.transfer(data)
+    return service.account.transfer(data)
   }
 
   return model

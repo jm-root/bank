@@ -14,7 +14,7 @@ module.exports = function (sequelize, DataTypes) {
           this.setDataValue('code', val.toLowerCase())
         }
       },
-      name: {type: DataTypes.STRING(32), unique: true, allowNull: false, comment: '唯一名称'}
+      name: { type: DataTypes.STRING(32), unique: true, allowNull: false, comment: '唯一名称' }
     },
     {
       tableName: 'ct',
@@ -36,8 +36,8 @@ module.exports = function (sequelize, DataTypes) {
       attributes: ['id', 'code', 'name']
     })
     doc.forEach(ct => {
-      const doc = ct.get({plain: true})
-      const {id, code} = doc
+      const doc = ct.get({ plain: true })
+      const { id, code } = doc
       idMap[id] = doc
       codeMap[code] = doc
     })
@@ -51,7 +51,7 @@ module.exports = function (sequelize, DataTypes) {
    * @param code
    * @returns {Promise<*>}
    */
-  model.get = async function ({id, code}) {
+  model.get = async function ({ id, code }) {
     if (!code && !id) {
       throw error.err(Err.FA_INVALID_CT)
     }
