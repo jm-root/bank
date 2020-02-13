@@ -1,6 +1,7 @@
 const jmss = require('jm-ms-sequelize')
 const MS = require('jm-ms-core')
 const ms = new MS()
+const { Op } = require('sequelize')
 
 module.exports = function (service, opts) {
   const model = service.transfer
@@ -56,14 +57,17 @@ module.exports = function (service, opts) {
       opts.conditions || (opts.conditions = {})
 
       if (accountId !== undefined) {
-        opts.conditions.$or = [
-          {
-            fromAccountId: accountId
-          },
-          {
-            toAccountId: accountId
-          }
-        ]
+        const where = {
+          [Op.or]: [
+            {
+              fromAccountId: accountId
+            },
+            {
+              toAccountId: accountId
+            }
+          ]
+        }
+        Object.assign(opts.conditions, where)
       }
 
       if (fromAccountId !== undefined && !fromAccountId) fromAccountId = null
