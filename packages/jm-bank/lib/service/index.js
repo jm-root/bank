@@ -1,5 +1,4 @@
 const log = require('jm-log4js')
-const { EventEmitter } = require('jm-event')
 const fs = require('fs')
 const path = require('path')
 const DAO = require('./dao')
@@ -8,10 +7,9 @@ const t = require('../locale')
 
 const logger = log.getLogger('bank')
 
-/**
- * Class representing a bank.
- */
-class Bank extends EventEmitter {
+const { Service } = require('jm-server')
+
+module.exports = class extends Service {
   /**
    * Create a bank.
    * @param {Object} opts
@@ -21,12 +19,10 @@ class Bank extends EventEmitter {
      * }
    */
   constructor (opts = {}) {
-    super({ async: true })
-    this.onReady()
+    super(opts)
 
     this.logger = logger
     this.t = t
-    this.ready = false
     this.db = require('./mysql')(opts)
     let db = this.db
 
@@ -49,20 +45,12 @@ class Bank extends EventEmitter {
     db
       .sync()
       .then(() => {
-        this.ready = true
         this.emit('ready')
       })
   }
 
-  async onReady () {
-    if (this.ready) return
-    return new Promise(resolve => {
-      this.once('ready', () => {
-        this.ready = true
-        resolve()
-      })
-    })
+  router (opts) {
+    const dir = `${__dirname}/../router`
+    return this.loadRouter(dir, opts)
   }
 }
-
-module.exports = Bank

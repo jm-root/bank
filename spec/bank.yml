@@ -1,8 +1,9 @@
 openapi: 3.0.0
 # Added by API Auto Mocking Plugin
 servers:
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/jm-root/bank/4.0.0
+  - url: 'http://localhost:3000/bank'
+  - url: 'https://api.l.jamma.cn/bank'
+  - url: 'https://api.jamma.cn/bank'
 info:
   version: "4.0.0"
   title: jm-bank-api

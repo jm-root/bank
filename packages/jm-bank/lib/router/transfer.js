@@ -1,11 +1,10 @@
 const jmss = require('jm-ms-sequelize')
-const MS = require('jm-ms-core')
-const ms = new MS()
+const { ms } = require('jm-server')
 const { Op } = require('sequelize')
 
-module.exports = function (service, opts) {
+module.exports = function (service) {
   const model = service.transfer
-  let router = ms.router()
+  const router = ms.router()
 
   router
     .add('/', 'get', async (opts = {}) => {

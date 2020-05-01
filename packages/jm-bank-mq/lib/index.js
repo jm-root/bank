@@ -1,58 +1,51 @@
 const log = require('jm-log4js')
-const logger = log.getLogger('bank')
-const MS = require('jm-ms')
+const logger = log.getLogger('bank-mq')
+const { Service } = require('jm-server')
 
-let ms = new MS()
+class $ extends Service {
+  constructor (opts, app) {
+    super(opts)
+    const { gateway } = opts
+    const { bank } = app.modules
 
-module.exports = function (opts, app) {
-  ['gateway'].forEach(function (key) {
-    process.env[key] && (opts[key] = process.env[key])
-  })
+    if (!gateway) {
+      logger.warn('no gateway config. I will not work.')
+      return
+    }
 
-  let o = {
-    ready: true,
-    gateway: opts.gateway,
+    if (!bank) {
+      logger.warn('no bank module found. I will not work.')
+      return
+    }
 
-    onReady: function () {
-      return this.ready
-    },
+    require('./gateway')({ gateway }).then(doc => {
+      doc.bind('mq')
+      this.gateway = doc
+      this.emit('ready')
+    })
 
-    bind: async function (name, uri) {
-      uri || (uri = `/${name}`)
-      let doc = await ms.client({ uri: this.gateway + uri })
-      this[name] = doc
-      return doc
+    const v = ['user.create', 'updateAmount', 'transfer']
+
+    v.forEach(key => {
+      bank.on(key, opts => {
+        opts && (this.send(`bank.${key}`, opts))
+      })
+    })
+  }
+
+  async send (topic, message) {
+    await this.onReady()
+    const msg = `topic: ${topic} message: ${JSON.stringify(message)}`
+    try {
+      logger.debug(`send mq. ${msg}`)
+      await this.gateway.mq.post(`/${topic}`, { message })
+    } catch (e) {
+      logger.error(`send mq fail. ${msg}`)
+      logger.error(e)
     }
   }
+}
 
-  if (!app.modules.bank) {
-    logger.warn('no bank module found. so I can not work.')
-    return o
-  }
-  if (!opts.gateway) {
-    logger.warn('no gateway config. so I can not work.')
-    return o
-  }
-
-  o.bind('mq')
-
-  let bank = app.modules.bank
-
-  let send = async function (topic, message) {
-    return o.mq.post(`/${topic}`, { message })
-      .catch(e => {
-        logger.error(`send mq fail. topic: ${topic} message: ${JSON.stringify(message)}`)
-        logger.error(e)
-      })
-  }
-
-  bank.on('user.create', function (opts) {
-    opts && (send('bank.user.create', opts))
-  })
-  bank.on('updateAmount', function (opts) {
-    opts && (send('bank.updateAmount', opts))
-  })
-  bank.on('transfer', function (opts) {
-    opts && (send('bank.transfer', opts))
-  })
+module.exports = function (opts, app) {
+  return new $(opts, app)
 }
