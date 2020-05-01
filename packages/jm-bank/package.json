@@ -23,8 +23,7 @@
   "homepage": "https://github.com/jm-root/bank",
   "dependencies": {
     "cls-hooked": "^4.2.2",
-    "jm-ms-sequelize": "^1.0.9",
-    "jm-ms-wrapper": "^1.0.1",
+    "jm-ms-sequelize": "^1.0.10",
     "mysql2": "^2.1.0",
     "sequelize": "^5.21.3"
   },
